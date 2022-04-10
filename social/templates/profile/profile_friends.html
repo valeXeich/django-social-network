@@ -1,0 +1,331 @@
+{% extends 'base.html' %}
+
+{% block title %}Friends{% endblock title %}
+
+{% block content %}
+<section>
+		<div class="feature-photo">
+			<figure><img src="https://supplychainbeyond.com/wp-content/uploads/2018/03/artificial-intelligence-in-supply-chain-1366x400.jpg" alt=""></figure>
+			{% if friend_request %}
+			<form action="{% url 'profiles:accept-friend' %}" method="post">
+				{% csrf_token %}
+			<div class="add-btn">
+				<span>1205 followers</span>
+					<button type="submit">Принять запрос</button>
+				<input type="hidden" name="profile_sender" value="{{ profile.id }}">
+			</div>
+			</form>
+			{% endif %}
+			{% if receiver == 'not receiver' and friend_request == False %}
+			<form action="{% url 'profiles:cancel-or-send-friend-request' %}" method="post">
+				{% csrf_token %}
+			<div class="add-btn">
+				<span>1205 followers</span>
+					<button type="submit">Добавить в друзья</button>
+					<input type="hidden" name="receiver_id" value="{{ profile.id }}">
+			</div>
+			</form>
+			{% elif receiver == 'receiver' %}
+			<form action="{% url 'profiles:cancel-or-send-friend-request' %}" method="post">
+				{% csrf_token %}
+			<div class="add-btn">
+				<span>1205 followers</span>
+					<button type="submit">Отменить запрос</button>
+				<input type="hidden" name="receiver_id" value="{{ profile.id }}">
+			</div>
+			</form>
+			{% elif request.user in profile.friends.all %}
+			<form action="{% url 'profiles:delete-friend' %}" method="post">
+				{% csrf_token %}
+			<div class="add-btn">
+				<span>1205 followers</span>
+					<button type="submit">Удалить из друзей</button>
+				<input type="hidden" name="profile" value="{{ profile.id }}">
+			</div>
+			</form>
+			{% endif %}
+			<form class="edit-phto">
+				<i class="fa fa-camera-retro"></i>
+				<label class="fileContainer">
+					Edit Cover Photo
+				<input type="file"/>
+				</label>
+			</form>
+			<div class="container-fluid">
+				<div class="row merged">
+					<div class="col-lg-2 col-sm-3">
+						<div class="user-avatar">
+							<figure>
+								<img src="{{ profile.avatar.url }}" alt="">
+								<form class="edit-phto">
+									<i class="fa fa-camera-retro"></i>
+									<label class="fileContainer">
+										Edit Display Photo
+										<input type="file"/>
+									</label>
+								</form>
+							</figure>
+						</div>
+					</div>
+					<div class="col-lg-10 col-sm-9">
+						<div class="timeline-info">
+							<ul>
+								<li class="admin-name">
+								  <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
+								  <span>Group Admin</span>
+								</li>
+								<li>
+									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">time line</a>
+									<a class="" href="timeline-photos.html" title="" data-ripple="">Photos</a>
+									<a class="" href="timeline-videos.html" title="" data-ripple="">Videos</a>
+									<a class="active" href="timeline-friends.html" title="" data-ripple="">Friends</a>
+									<a class="" href="timeline-groups.html" title="" data-ripple="">Groups</a>
+									<a class="" href="about.html" title="" data-ripple="">about</a>
+									<a class="" href="#" title="" data-ripple="">more</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section><!-- top area -->
+
+	<section>
+		<div class="gap gray-bg">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="row" id="page-contents">
+							<div class="col-lg-3">
+								<aside class="sidebar static">
+									<div class="widget">
+											<h4 class="widget-title">Socials</h4>
+											<ul class="socials">
+												<li class="facebook">
+													<a title="" href="#"><i class="fa fa-facebook"></i> <span>facebook</span> <ins>45 likes</ins></a>
+												</li>
+												<li class="twitter">
+													<a title="" href="#"><i class="fa fa-twitter"></i> <span>twitter</span><ins>25 likes</ins></a>
+												</li>
+												<li class="google">
+													<a title="" href="#"><i class="fa fa-google"></i> <span>google</span><ins>35 likes</ins></a>
+												</li>
+											</ul>
+										</div>
+
+									{% include 'shortcuts.html' %} <!-- Shortcuts -->
+
+									<div class="widget">
+										<h4 class="widget-title">Recent Activity</h4>
+										<ul class="activitiez">
+											<li>
+												<div class="activity-meta">
+													<i>10 hours Ago</i>
+													<span><a href="#" title="">Commented on Video posted </a></span>
+													<h6>by <a href="newsfeed.html">black demon.</a></h6>
+												</div>
+											</li>
+											<li>
+												<div class="activity-meta">
+													<i>30 Days Ago</i>
+													<span><a href="newsfeed.html" title="">Posted your status. “Hello guys, how are you?”</a></span>
+												</div>
+											</li>
+											<li>
+												<div class="activity-meta">
+													<i>2 Years Ago</i>
+													<span><a href="#" title="">Share a video on her timeline.</a></span>
+													<h6>"<a href="newsfeed.html">you are so funny mr.been.</a>"</h6>
+												</div>
+											</li>
+										</ul>
+									</div><!-- recent activites -->
+									<div class="widget stick-widget">
+										<h4 class="widget-title">Who's follownig</h4>
+										<ul class="followers">
+											<li>
+												<figure><img src="images/resources/friend-avatar2.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Kelly Bill</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar4.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Issabel</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar6.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Andrew</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar8.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Sophia</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar3.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Allen</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+										</ul>
+									</div><!-- who's following -->
+								</aside>
+							</div><!-- sidebar -->
+
+                            <div class="col-lg-6">
+								<div class="central-meta">
+									<div class="frnds">
+										<ul class="nav nav-tabs">
+											 <li class="nav-item"><a class="active" href="#frends" data-toggle="tab">My Friends</a> <span>{{ profile.get_friends_list.count }}</span></li>
+											 <li class="nav-item"><a class="" href="#frends-req" data-toggle="tab">Friend Requests</a><span>{{ profile.get_friends_request|length }}</span></li>
+										</ul>
+
+										<!-- Tab panes -->
+										<div class="tab-content">
+										  <div class="tab-pane active fade show " id="frends" >
+											<ul class="nearby-contct">
+                                                {% for friend in profile.get_friends_list %}
+											<li>
+												<div class="nearly-pepls">
+													<figure>
+														<a href="{{ friend.get_absolute_url }}" title=""><img src="{{ friend.avatar.url }}" alt=""></a>
+													</figure>
+													<div class="pepl-info">
+														<h4><a href="{{ friend.get_absolute_url }}" title="">{{ friend.first_name }} {{ friend.last_name }}</a></h4>
+														<span>ftv model</span>
+														{% if request.user.profile == profile %}
+														<form action="{% url 'profiles:delete-friend' %}" method="post">
+															{% csrf_token %}
+														<button type="submit" class="add-butn" >Удалить</button>
+														<input type="hidden" name="profile" value="{{ friend.id }}">
+															<input type="hidden" name="friend-page" value="friend-page">
+														</form>
+														{% endif %}
+													</div>
+												</div>
+											</li>
+                                                {% endfor %}
+										</ul>
+											<div class="lodmore"><button class="btn-view btn-load-more"></button></div>
+										  </div>
+										  <div class="tab-pane fade" id="frends-req" >
+											<ul class="nearby-contct">
+											{% for sender in profile.get_friends_request %}
+											<li>
+												<div class="nearly-pepls">
+													<figure>
+														<a href="time-line.html" title=""><img src="{{ sender.avatar.url }}" alt=""></a>
+													</figure>
+													<div class="pepl-info">
+														<h4><a href="time-line.html" title="">{{ sender.first_name }} {{ sender.last_name }}</a></h4>
+														<span>ftv model</span>
+
+														<form action="{% url 'profiles:accept-friend' %}" method="post">
+														{% csrf_token %}
+														<button type="submit" class="add-butn more-action">Отклонить</button>
+															<input type="hidden" name="delete_request" value="delete_request">
+															<input type="hidden" name="friend-page" value="friend-page">
+															<input type="hidden" name="profile_sender" value="{{ sender.id }}">
+														</form>
+
+														<form action="{% url 'profiles:accept-friend' %}" method="post">
+														{% csrf_token %}
+														<button type="submit" class="add-butn">Принять</button>
+														<input type="hidden" name="accept_request" value="accept_request">
+															<input type="hidden" name="friend-page" value="friend-page">
+															<input type="hidden" name="profile_sender" value="{{ sender.id }}">
+														</form>
+
+													</div>
+												</div>
+											</li>
+										{% endfor %}
+										</ul>
+											  <button class="btn-view btn-load-more"></button>
+										  </div>
+										</div>
+									</div>
+								</div>
+							</div><!-- centerl meta -->
+
+							<div class="col-lg-3">
+								<aside class="sidebar static">
+                                    <div class="widget">
+										<h4 class="widget-title">Who's follownig</h4>
+										<ul class="followers">
+											<li>
+												<figure><img src="images/resources/friend-avatar2.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Kelly Bill</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar4.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Issabel</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar6.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Andrew</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar8.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Sophia</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+											<li>
+												<figure><img src="images/resources/friend-avatar3.jpg" alt=""></figure>
+												<div class="friend-meta">
+													<h4><a href="time-line.html" title="">Allen</a></h4>
+													<a href="#" title="" class="underline">Add Friend</a>
+												</div>
+											</li>
+										</ul>
+									</div><!-- who's following -->
+									<div class="widget friend-list stick-widget">
+										<h4 class="widget-title">Friends</h4>
+										<div id="searchDir"></div>
+										<ul id="people-list" class="friendz-list">
+											{% for friend in profile.get_friends_list %}
+											<li>
+												<figure>
+													<a href="#"><img src="{{ friend.avatar.url }}" alt=""></a>
+													<span class="status f-online"></span>
+												</figure>
+												<div class="friendz-meta">
+													<a href="time-line.html">{{ friend.first_name }} {{ friend.last_name }}</a>
+													<i><a href="{{ friend.get_absolute_url }}">@{{ friend.user }}</a></i>
+												</div>
+											</li>
+											{% endfor %}
+										</ul>
+									</div><!-- friends list sidebar -->
+								</aside>
+							</div><!-- sidebar -->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+{% endblock content %}
