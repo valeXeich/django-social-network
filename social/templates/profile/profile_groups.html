@@ -5,13 +5,13 @@
 {% block content %}
 <section>
 		<div class="feature-photo">
-			<figure><img src="https://supplychainbeyond.com/wp-content/uploads/2018/03/artificial-intelligence-in-supply-chain-1366x400.jpg" alt=""></figure>
+			<figure><img src="{{ profile.background.url }}" alt=""></figure>
 			{% if friend_request %}
 			<form action="{% url 'profiles:accept-friend' %}" method="post">
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Принять запрос</button>
+					<button type="submit">Accept request</button>
 				<input type="hidden" name="profile_sender" value="{{ profile.id }}">
 			</div>
 			</form>
@@ -21,7 +21,7 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Добавить в друзья</button>
+					<button type="submit">Add Friend</button>
 					<input type="hidden" name="receiver_id" value="{{ profile.id }}">
 			</div>
 			</form>
@@ -30,7 +30,7 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Отменить запрос</button>
+					<button type="submit">Cancel Request</button>
 				<input type="hidden" name="receiver_id" value="{{ profile.id }}">
 			</div>
 			</form>
@@ -39,31 +39,33 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Удалить из друзей</button>
+					<button type="submit">Delete friend</button>
 				<input type="hidden" name="profile" value="{{ profile.id }}">
 			</div>
 			</form>
 			{% endif %}
-			<form class="edit-phto">
+			{% if request.user == profile.user %}
+			<div class="edit-phto">
 				<i class="fa fa-camera-retro"></i>
-				<label class="fileContainer">
+				<label class="fileContainer" data-toggle="modal" data-target="#changeBackground">
 					Edit Cover Photo
-				<input type="file"/>
 				</label>
-			</form>
+			</div>
+			{% endif %}
 			<div class="container-fluid">
 				<div class="row merged">
 					<div class="col-lg-2 col-sm-3">
 						<div class="user-avatar">
 							<figure>
 								<img src="{{ profile.avatar.url }}" alt="">
-								<form class="edit-phto">
+								{% if request.user == profile.user %}
+								<div class="edit-phto">
 									<i class="fa fa-camera-retro"></i>
-									<label class="fileContainer">
+									<label class="fileContainer" data-toggle="modal" data-target="#changeAvatar">
 										Edit Display Photo
-										<input type="file"/>
 									</label>
-								</form>
+								</div>
+								{% endif %}
 							</figure>
 						</div>
 					</div>
@@ -72,16 +74,15 @@
 							<ul>
 								<li class="admin-name">
 								  <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
-								  <span>Group Admin</span>
+								  <span>@{{ profile.slug }}</span>
 								</li>
 								<li>
-									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">time line</a>
-									<a class="" href="timeline-photos.html" title="" data-ripple="">Photos</a>
-									<a class="" href="timeline-videos.html" title="" data-ripple="">Videos</a>
-									<a class="active" href="timeline-friends.html" title="" data-ripple="">Friends</a>
-									<a class="" href="timeline-groups.html" title="" data-ripple="">Groups</a>
-									<a class="" href="about.html" title="" data-ripple="">about</a>
-									<a class="" href="#" title="" data-ripple="">more</a>
+									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
+									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
+									<a class="active" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
+									{% if request.user == profile.user %}
+									<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
+									{% endif %}
 								</li>
 							</ul>
 						</div>
@@ -194,13 +195,28 @@
 										<li>
 											<div class="nearly-pepls">
 												<figure>
-													<a href="time-line.html" title=""><img src="{{ group.avatar.url }}" alt=""></a>
+													<a href="{{ group.get_absolute_url }}" title=""><img src="{{ group.avatar.url }}" alt=""></a>
 												</figure>
 												<div class="pepl-info">
 													<h4><a href="{{ group.get_absolute_url }}" title="">{{ group.name }} </a></h4>
-													<span>public group</span>
-													<em>{{ group.followers.count }} Участников</em>
-													<button href="#" title="" class="add-butn" data-ripple="">join now</button>
+													<em>{{ group.followers.count }} Members</em>
+													{% if request.user.profile in group.followers.all %}
+													<form action="{% url 'groups:group-follow' %}" method="post">
+														{% csrf_token %}
+														<button type="submit" class="add-butn">Unfollow</button>
+														<input type="hidden" name="group_id" value="{{ group.id }}">
+														<input type="hidden" name="unfollow" value="unfollow">
+														<input type="hidden" name="from_profile" value="{{ profile.slug }}">
+													</form>
+													{% else %}
+													<form action="{% url 'groups:group-follow' %}" method="post">
+														{% csrf_token %}
+														<button type="submit" class="add-butn">Follow</button>
+														<input type="hidden" name="group_id" value="{{ group.id }}">
+														<input type="hidden" name="follow" value="follow">
+														<input type="hidden" name="from_profile" value="{{ profile.slug }}">
+													</form>
+													{% endif %}
 												</div>
 											</div>
 										</li>
@@ -277,4 +293,50 @@
 			</div>
 		</div>
 	</section>
+
+{% if request.user == profile.user %}
+<!--modal change background-->
+<div id="changeBackground" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Upload background</h4>
+			</div>
+			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
+			<div class="modal-body">
+					{% csrf_token %}
+					{{ form_ab.background }}
+				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+				</form>
+		</div>
+	</div>
+</div>
+
+<!--modal change avatar-->
+<div id="changeAvatar" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Upload avatar</h4>
+			</div>
+			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
+			<div class="modal-body">
+					{% csrf_token %}
+					{{ form_ab.avatar }}
+				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button class="btn btn-danger" data-dismiss="modal">Close</button>
+			</div>
+				</form>
+		</div>
+	</div>
+</div>
+{% endif %}
 {% endblock content %}

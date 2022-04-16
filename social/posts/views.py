@@ -1,12 +1,14 @@
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import FormView, DeleteView
+from django.views.generic import FormView, DeleteView, ListView
 
-from group.models import Group
+from group.models import Group, GroupBan
 from profiles.models import Profile
 from .forms import PostForm, CommentForm
 from .models import Post, Comment
+from .utils import get_posts_for_user
 
 
 class PostFormView(FormView):
@@ -14,10 +16,12 @@ class PostFormView(FormView):
 
     def get_success_url(self, **kwargs):
         user = self.request.user
-        if self.request.POST.get('group_post') == 'group_post':
+        if self.request.POST.get('group_post'):
             group_id = self.request.POST.get('group_id')
             group = Group.objects.get(id=group_id)
             return reverse_lazy('groups:group-detail', kwargs={'slug': group.slug})
+        elif self.request.POST.get('feed'):
+            return reverse_lazy('posts:news')
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': user.profile.slug})
 
     def post(self, request, *args, **kwargs):
@@ -39,14 +43,25 @@ class PostFormView(FormView):
         return super().form_valid(form)
 
 
-class CommentView(FormView):
+class CommentView(LoginRequiredMixin, UserPassesTestMixin, FormView):
     form_class = CommentForm
+
+    def test_func(self):
+        profile = self.request.user.profile
+        if self.request.POST.get('group_slug'):
+            group_slug = self.request.POST.get('group_slug')
+            group = Group.objects.get(slug=group_slug)
+            group_ban_review = GroupBan.objects.get(group=group, ban_type='comment_ban')
+            return profile not in group_ban_review.follower.all()
+        return True
 
     def get_success_url(self):
         user = self.request.user
         if self.request.POST.get('group_slug'):
             group_slug = self.request.POST.get('group_slug')
             return reverse_lazy('groups:group-detail', kwargs={'slug': group_slug})
+        elif self.request.POST.get('feed'):
+            return reverse_lazy('posts:news')
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': user.profile.slug})
 
     def post(self, request, *args, **kwargs):
@@ -63,6 +78,10 @@ class CommentView(FormView):
         self.object = form.save(commit=False)
         self.object.author = user.profile
         self.object.post = post
+        if self.request.POST.get('group_slug'):
+            group_slug = self.request.POST.get('group_slug')
+            group = Group.objects.get(slug=group_slug)
+            self.object.group = group
         self.object.save()
         return super().form_valid(form)
 
@@ -81,6 +100,8 @@ class LikeUpdate(View):
             group_id = request.POST.get('group_id')
             group = Group.objects.get(id=group_id)
             return redirect('groups:group-detail', slug=group.slug)
+        elif request.POST.get('feed'):
+            return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile.slug)
 
 class DislikeUpdate(View):
@@ -98,6 +119,8 @@ class DislikeUpdate(View):
             group_id = request.POST.get('group_id')
             group = Group.objects.get(id=group_id)
             return redirect('groups:group-detail', slug=group.slug)
+        elif request.POST.get('feed'):
+            return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile.slug)
 
 class DeletePostView(DeleteView):
@@ -109,6 +132,8 @@ class DeletePostView(DeleteView):
             group_id = self.request.POST.get('group_id')
             group = Group.objects.get(id=group_id)
             return reverse_lazy('groups:group-detail', kwargs={'slug': group.slug})
+        elif self.request.POST.get('feed'):
+            return reverse_lazy('posts:news')
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': user.profile.slug})
 
 
@@ -123,6 +148,20 @@ class DeleteCommentView(View):
             group_id = request.POST.get('group_id')
             group = Group.objects.get(id=group_id)
             return redirect('groups:group-detail', slug=group.slug)
+        elif self.request.POST.get('feed'):
+            return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile_slug)
 
 
+class NewsView(ListView):
+    model = Post
+    template_name = 'post/news_list.html'
+
+    def get_context_data(self, *args, **kwargs):
+        posts = get_posts_for_user(self.request.user.profile)
+        context = super().get_context_data(*args, **kwargs)
+        context['form_post'] = PostForm
+        context['form_comment'] = CommentForm
+        context['profile'] = self.request.user.profile
+        context['posts'] = posts
+        return context

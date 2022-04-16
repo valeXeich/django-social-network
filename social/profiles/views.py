@@ -2,9 +2,10 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, UpdateView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from posts.forms import PostForm, CommentForm
 
-from .forms import AvatarUpdateForm
+from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm
 from .models import Profile, Relationship
 from .utils import permission_create_post, check_relationship, check_friend_request
 
@@ -21,7 +22,7 @@ class ProfileDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         context['form_post'] = PostForm
         context['form_comment'] = CommentForm
-        context['form_avatar'] = AvatarUpdateForm
+        context['form_ab'] = AvatarBackgroundUpdateForm
         context['check_current_user'] = permission_create_post(self.request.user)
         context['receiver'] = receiver
         context['friend_request'] = friend_request
@@ -34,17 +35,21 @@ class ProfileFriendsDetailView(DetailView):
     template_name = 'profile/profile_friends.html'
     context_object_name = 'profile'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_ab'] = AvatarBackgroundUpdateForm
+        return context
+
 
 class ProfileGroupsDetailView(DetailView):
     model = Profile
     template_name = 'profile/profile_groups.html'
     context_object_name = 'profile'
 
-
-class ProfileAboutView(DetailView):
-    model = Profile
-    template_name = 'profile/profile_about.html'
-    context_object_name = 'profile'
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_ab'] = AvatarBackgroundUpdateForm
+        return context
 
 
 class RelationshipCreateView(View):
@@ -58,6 +63,11 @@ class RelationshipCreateView(View):
         if not created:
             rel.delete()
         return redirect('profiles:profile-detail', slug=receiver.slug)
+
+
+class MessagesView(DetailView):
+    model = Profile
+    template_name = 'profile/profile_messages.html'
 
 
 class DeleteFriendView(View):
@@ -92,14 +102,37 @@ class AcceptFriendRequest(View):
         return redirect('profiles:profile-detail', slug=sender.slug)
 
 
-class AvatarUpdateView(UpdateView):
-    form_class = AvatarUpdateForm
+class AvatarBackgroundUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = AvatarBackgroundUpdateForm
     model = Profile
+
+    def test_func(self):
+        profile = self.get_object()
+        return profile.user == self.request.user
 
     def get_success_url(self):
         profile_slug = self.request.POST.get('profile_slug')
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': profile_slug})
 
+
+class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    form_class = ProfileInfoUpdateForm
+    model = Profile
+    template_name = 'profile/profile_about.html'
+    context_object_name = 'profile'
+
+    def test_func(self):
+        profile = self.get_object()
+        return profile.user == self.request.user
+
+    def get_success_url(self):
+        profile_slug = self.request.POST.get('profile_slug')
+        return reverse_lazy('profiles:update-info', kwargs={'slug': profile_slug})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form_ab'] = AvatarBackgroundUpdateForm
+        return context
 
 
 

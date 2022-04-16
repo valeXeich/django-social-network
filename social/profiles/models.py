@@ -2,17 +2,25 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+from django_countries.fields import CountryField
 
 
 class Profile(models.Model):
+    GENDER_CHOICES = (
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+    )
+
     first_name = models.CharField(max_length=200, blank=True)
     last_name = models.CharField(max_length=200, blank=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     about = models.TextField(max_length=500, blank=True)
     email = models.EmailField(max_length=200, blank=True)
-    country = models.CharField(max_length=200, blank=True)
-    avatar = models.ImageField(default='avatar.png', upload_to='avatars/')
-    background = models.ImageField(default='background.png', upload_to='background/')
+    country = CountryField(blank=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
+    date_birth = models.DateField(blank=True, null=True)
+    avatar = models.ImageField(default='avatars/avatar.png', upload_to='avatars/')
+    background = models.ImageField(default='background/background.png', upload_to='background/')
     friends = models.ManyToManyField(User, blank=True, related_name='friends')
     slug = models.SlugField(unique=True, blank=True)
     updated_date = models.DateTimeField(auto_now=True)

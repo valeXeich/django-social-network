@@ -1,0 +1,71 @@
+<div class="col-lg-3">
+	<aside class="sidebar static">
+
+		<div class="widget friend-list">
+			<h4 class="widget-title">Top 5 followers by comments</h4>
+			<ul id="people-list" class="friendz-list" style="margin-top: 0px;">
+				{% for follower in group.get_comments_post_group %}
+				<li>
+					<figure>
+						<a href="{{ follower.0.get_absolute_url }}"><img src="{{ follower.0.avatar.url }}" alt=""></a>
+						<span class="status f-online"></span>
+					</figure>
+					<div class="friendz-meta">
+						<a href="{{ follower.0.get_absolute_url }}">{{ follower.0.first_name }} {{ follower.0.last_name }}</a>
+						<i>Total comments: {{ follower.1 }}</i>
+					</div>
+				</li>
+				{% endfor %}
+			</ul>
+		</div><!-- friends list sidebar -->
+
+		<div class="widget friend-list">
+			<h4 class="widget-title">Top 5 followers by likes</h4>
+			<ul id="people-list" class="friendz-list" style="margin-top: 0px;">
+				{% for follower in group.get_likes_post_group %}
+				<li>
+					<figure>
+						<a href="{{ follower.0.get_absolute_url }}"><img src="{{ follower.0.avatar.url }}" alt=""></a>
+						<span class="status f-online"></span>
+					</figure>
+					<div class="friendz-meta">
+						<a href="{{ follower.0.get_absolute_url }}">{{ follower.0.first_name }} {{ follower.0.last_name }}</a>
+						<i>Total likes: {{ follower.1 }}</i>
+					</div>
+				</li>
+				{% endfor %}
+			</ul>
+		</div><!-- friends list sidebar -->
+
+		<div class="widget friend-list">
+			<h4 class="widget-title">Сontacts</h4>
+			<ul id="people-list" class="friendz-list" style="margin-top: 0px;">
+				{% for contact in group.get_admin_and_staff %}
+				{% if contact.profile == group.admin_group %}
+				<li>
+					<figure>
+						<a href="{{ contact.profile.get_absolute_url }}"><img src="{{ contact.profile.avatar.url }}" alt=""></a>
+						<span class="status f-online"></span>
+					</figure>
+					<div class="friendz-meta">
+						<a href="{{ contact.profile.get_absolute_url }}">{{ contact.profile.first_name }} {{ contact.profile.last_name }}</a>
+						<i>Admin</i>
+					</div>
+				</li>
+				{% else %}
+				<li>
+					<figure>
+						<a href="{{ contact.profile.get_absolute_url }}"><img src="{{ contact.profile.avatar.url }}" alt=""></a>
+						<span class="status f-online"></span>
+					</figure>
+					<div class="friendz-meta">
+						<a href="{{ contact.profile.get_absolute_url }}">{{ contact.profile.first_name }} {{ contact.profile.last_name }}</a>
+						<i>Staff</i>
+					</div>
+				</li>
+				{% endif %}
+				{% endfor %}
+			</ul>
+		</div><!-- friends list sidebar -->
+	</aside>
+</div><!-- sidebar -->

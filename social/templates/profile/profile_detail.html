@@ -11,7 +11,7 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Принять запрос</button>
+					<button type="submit">Accept request</button>
 				<input type="hidden" name="profile_sender" value="{{ profile.id }}">
 			</div>
 			</form>
@@ -21,7 +21,7 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Добавить в друзья</button>
+					<button type="submit">Add Friend</button>
 					<input type="hidden" name="receiver_id" value="{{ profile.id }}">
 			</div>
 			</form>
@@ -30,7 +30,7 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Отменить запрос</button>
+					<button type="submit">Cancel Request</button>
 				<input type="hidden" name="receiver_id" value="{{ profile.id }}">
 			</div>
 			</form>
@@ -39,29 +39,33 @@
 				{% csrf_token %}
 			<div class="add-btn">
 				<span>1205 followers</span>
-					<button type="submit">Удалить из друзей</button>
+					<button type="submit">Delete friend</button>
 				<input type="hidden" name="profile" value="{{ profile.id }}">
 			</div>
 			</form>
 			{% endif %}
+			{% if request.user == profile.user %}
 			<div class="edit-phto">
 				<i class="fa fa-camera-retro"></i>
 				<label class="fileContainer" data-toggle="modal" data-target="#changeBackground">
-					Изменить фон
+					Edit Cover Photo
 				</label>
 			</div>
+			{% endif %}
 			<div class="container-fluid">
 				<div class="row merged">
 					<div class="col-lg-2 col-sm-3" >
 						<div class="user-avatar">
 							<figure>
 								<img src="{{ profile.avatar.url }}" alt="">
+								{% if request.user == profile.user %}
 								<div class="edit-phto">
 									<i class="fa fa-camera-retro"></i>
 									<label class="fileContainer" data-toggle="modal" data-target="#changeAvatar">
-										Изменить аватар
+										Edit Display Photo
 									</label>
 								</div>
+								{% endif %}
 							</figure>
 						</div>
 					</div>
@@ -70,15 +74,15 @@
 							<ul>
 								<li class="admin-name">
 								  <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
-								  <span>Group Admin</span>
+								  <span>@{{ profile.slug }}</span>
 								</li>
 								<li>
-									<a class="active" href="time-line.html" title="" data-ripple="">Стена</a>
-									<a class="" href="timeline-photos.html" title="" data-ripple="">Фотографии</a>
-									<a class="" href="timeline-videos.html" title="" data-ripple="">Видео</a>
-									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Друзья</a>
-									<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Группы</a>
-									<a class="" href="{% url 'profiles:profile-about' slug=profile.slug %}" title="" data-ripple="">Обо мне</a>
+									<a class="active" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
+									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
+									<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
+									{% if request.user == profile.user %}
+									<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
+									{% endif %}
 								</li>
 							</ul>
 						</div>
@@ -97,15 +101,15 @@
 							<div class="col-lg-3">
 								<aside class="sidebar static">
 									<div class="widget">
-										<h4 class="widget-title">Информация</h4>
-												<div class="tab-pane fade show active" id="basic" >
+										<h4 class="widget-title">INFORMATION</h4>
+												<div class="tab-pane fade show active" id="" >
 													<ul class="basics">
-														<li><i class="ti-user"></i>{{ profile.first_name }} {{ profile.last_name }}</li>
-														<li><i class="ti-map-alt"></i>live in Dubai</li>
-														<li><i class="ti-mobile"></i>+1-234-345675</li>
-														<li><i class="ti-email"></i><a href="https://wpkixx.com/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="3c4553494e515d55507c59515d5550125f5351">[email&#160;protected]</a></li>
-														<li><i class="ti-world"></i>www.yoursite.com</li>
-														<li>Обо мне <br>www.yoursite.com</li>
+														<li>First name: {{ profile.first_name }}</li>
+														<li>Last name: {{ profile.last_name }}</li>
+														<li>Country: <img src="{{ profile.country.flag }}"> {{ profile.get_country_display }}</li>
+														<li>Gender: {{ profile.get_gender_display }}</li>
+														<li>Date of birth: {{ profile.date_birth }}</li>
+														<li>About me: <p>{{ profile.about }}</p></li>
 													</ul>
 												</div>
 									</div>
@@ -215,6 +219,11 @@
 										</div>
 									</div><!-- add post new box -->
 									{% endif %}
+
+									{% if profile.post.count == 0 %}
+									<h4 class="text-center">User has no posts</h4>
+									{% endif %}
+
 									{% for post in profile.get_post_list %}
 									<div class="central-meta item">
 										<div class="user-post">
@@ -230,7 +239,7 @@
 													{% if request.user.profile == post.author %}
 													<form action="{% url 'posts:post-delete' pk=post.pk %}" method="post" class="delete-btn">
 														{% csrf_token %}
-														<button type="submit" class="btn btn-outline-danger btn-sm">Удалить</button>
+														<button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
 													</form>
 													{% endif %}
 												</div>
@@ -240,19 +249,6 @@
 													{% endif %}
 													<div class="we-video-info">
 														<ul>
-
-															<li>
-																<span class="views" data-toggle="tooltip" title="views">
-																	<i class="fa fa-eye"></i>
-																	<ins>1.2k</ins>
-																</span>
-															</li>
-															<li>
-																<span class="comment" data-toggle="tooltip" title="Comments">
-																	<i class="fa fa-comments-o"></i>
-																	<ins>{{ post.comments.count }}</ins>
-																</span>
-															</li>
 															<li>
 																<form action="{% url 'posts:post-like' %}" method="post">
 																	{% csrf_token %}
@@ -273,38 +269,11 @@
 																</span>
 																</form>
 															</li>
-															<li class="social-media">
-																<div class="menu">
-																  <div class="btn trigger"><i class="fa fa-share-alt"></i></div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-html5"></i></a></div>
-																  </div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-facebook"></i></a></div>
-																  </div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-google-plus"></i></a></div>
-																  </div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-twitter"></i></a></div>
-																  </div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-css3"></i></a></div>
-																  </div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-instagram"></i></a>
-																	</div>
-																  </div>
-																	<div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-dribbble"></i></a>
-																	</div>
-																  </div>
-																  <div class="rotater">
-																	<div class="btn btn-icon"><a href="#" title=""><i class="fa fa-pinterest"></i></a>
-																	</div>
-																  </div>
-
-																</div>
+															<li>
+																<span class="comment" data-toggle="tooltip" title="Comments">
+																	<i class="fa fa-comments-o"></i>
+																	<ins>{{ post.comments.count }}</ins>
+																</span>
 															</li>
 														</ul>
 													</div>
@@ -325,11 +294,11 @@
 														</div>
 														<div class="we-comment">
 															<div class="coment-head">
-																<h5><a href="time-line.html" title="">{{ comment.author.first_name }} {{ comment.author.last_name }}</a></h5>
+																<h5><a href="{{ comment.author.get_absolute_url }}" title="">{{ comment.author.first_name }} {{ comment.author.last_name }}</a></h5>
 																<span>{{ comment.created_date }}</span>
 																<a class="we-reply" href="#" title="Reply"><i class="fa fa-reply"></i></a>
 																{% if request.user.profile == comment.author %}
-																	<i class="bi bi-x-circle delete-com icon-custom">
+																	<i class="bi bi-x-circle delete-com-g icon-custom">
 																		<form action="{% url 'posts:comment-delete' %}" method="post">
 																			{% csrf_token %}
 																			<button type="submit" class="btn-custom"></button>
@@ -355,7 +324,7 @@
 																{% csrf_token %}
 																{{ form_comment.text }}
 																<input type="hidden" name="post_id" value="{{ post.id }}">
-																<button type="submit">Оставить</button>
+																<button type="submit">Review</button>
 															</form>
 															{% endif %}
 														</div>
@@ -396,21 +365,23 @@
 		</div>
 	</section>
 
+{% if request.user == profile.user %}
+<!--modal change background-->
 <div id="changeBackground" class="modal fade">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Загрузить фон</h4>
+				<h4 class="modal-title">Upload background</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
 			<div class="modal-body">
 					{% csrf_token %}
-					{{ form_avatar.background }}
+					{{ form_ab.background }}
 				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
 			</div>
 			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Сохранить</button>
-				<button class="btn btn-danger" data-dismiss="modal">Закрыть</button>
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button class="btn btn-danger" data-dismiss="modal">Close</button>
 			</div>
 				</form>
 		</div>
@@ -422,21 +393,21 @@
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h4 class="modal-title">Загрузить аватар</h4>
+				<h4 class="modal-title">Upload avatar</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
 			<div class="modal-body">
 					{% csrf_token %}
-					{{ form_avatar.avatar }}
+					{{ form_ab.avatar }}
 				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
 			</div>
 			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Сохранить</button>
-				<button class="btn btn-danger" data-dismiss="modal">Закрыть</button>
+				<button type="submit" class="btn btn-primary">Save</button>
+				<button class="btn btn-danger" data-dismiss="modal">Close</button>
 			</div>
 				</form>
 		</div>
 	</div>
 </div>
-
+{% endif %}
 {% endblock content %}

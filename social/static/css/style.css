@@ -10057,6 +10057,11 @@ aside.sidebar.full-style {
     color: red;
 }
 
+.delete-com-g {
+    margin-left: 450px;
+    color: red;
+}
+
 .btn-custom {
     opacity: 0;
     position: absolute;
@@ -10071,3 +10076,14 @@ aside.sidebar.full-style {
     z-index: 1;
 }
 
+.info-title {
+    color: #088dcd;
+}
+
+.cus-label {
+    margin-top: 20px;
+}
+
+.span-about {
+    margin-left: 10px;
+}

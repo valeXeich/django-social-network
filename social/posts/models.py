@@ -30,6 +30,7 @@ class Post(models.Model):
 class Comment(models.Model):
     author = models.ForeignKey(Profile, on_delete=models.CASCADE)
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True, related_name='group_comments')
     text = models.TextField(max_length=300)
     updated_date = models.DateTimeField(auto_now=True)
     created_date = models.DateTimeField(auto_now_add=True)
