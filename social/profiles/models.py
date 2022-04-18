@@ -22,6 +22,7 @@ class Profile(models.Model):
     avatar = models.ImageField(default='avatars/avatar.png', upload_to='avatars/')
     background = models.ImageField(default='background/background.png', upload_to='background/')
     friends = models.ManyToManyField(User, blank=True, related_name='friends')
+    is_online = models.BooleanField(default=False)
     slug = models.SlugField(unique=True, blank=True)
     updated_date = models.DateTimeField(auto_now=True)
     created_date = models.DateTimeField(auto_now_add=True)

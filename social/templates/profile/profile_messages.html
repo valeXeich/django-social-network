@@ -5,70 +5,7 @@
 {% block content %}
 <section>
 		<div class="feature-photo">
-			<figure><img src="{{ profile.background.url }}" alt=""></figure>
-			{% if friend_request %}
-			<form action="{% url 'profiles:accept-friend' %}" method="post">
-				{% csrf_token %}
-			<div class="add-btn">
-				<span>1205 followers</span>
-					<button type="submit">Accept request</button>
-				<input type="hidden" name="profile_sender" value="{{ profile.id }}">
-			</div>
-			</form>
-			{% endif %}
-			{% if receiver == 'not receiver' and friend_request == False %}
-			<form action="{% url 'profiles:cancel-or-send-friend-request' %}" method="post">
-				{% csrf_token %}
-			<div class="add-btn">
-				<span>1205 followers</span>
-					<button type="submit">Add Friend</button>
-					<input type="hidden" name="receiver_id" value="{{ profile.id }}">
-			</div>
-			</form>
-			{% elif receiver == 'receiver' %}
-			<form action="{% url 'profiles:cancel-or-send-friend-request' %}" method="post">
-				{% csrf_token %}
-			<div class="add-btn">
-				<span>1205 followers</span>
-					<button type="submit">Cancel Request</button>
-				<input type="hidden" name="receiver_id" value="{{ profile.id }}">
-			</div>
-			</form>
-			{% elif request.user in profile.friends.all %}
-			<form action="{% url 'profiles:delete-friend' %}" method="post">
-				{% csrf_token %}
-			<div class="add-btn">
-				<span>1205 followers</span>
-					<button type="submit">Delete friend</button>
-				<input type="hidden" name="profile" value="{{ profile.id }}">
-			</div>
-			</form>
-			{% endif %}
-			{% if request.user == profile.user %}
-			<div class="edit-phto">
-				<i class="fa fa-camera-retro"></i>
-				<label class="fileContainer" data-toggle="modal" data-target="#changeBackground">
-					Edit Cover Photo
-				</label>
-			</div>
-			{% endif %}
-			<div class="container-fluid">
-				<div class="row merged">
-					<div class="col-lg-2 col-sm-3" >
-						<div class="user-avatar">
-							<figure>
-								<img src="{{ profile.avatar.url }}" alt="">
-								{% if request.user == profile.user %}
-								<div class="edit-phto">
-									<i class="fa fa-camera-retro"></i>
-									<label class="fileContainer" data-toggle="modal" data-target="#changeAvatar">
-										Edit Display Photo
-									</label>
-								</div>
-								{% endif %}
-							</figure>
-						</div>
-					</div>
+			{% include 'profile/profile_button_background.html' %}
 					<div class="col-lg-10 col-sm-9">
 						<div class="timeline-info">
 							<ul>
@@ -190,16 +127,33 @@
 										<h5 class="f-title"><i class="ti-bell"></i>All Messages <span class="more-options"><i class="fa fa-ellipsis-h"></i></span></h5>
 										<div class="message-box">
 											<ul class="peoples">
-
+												{% for dialog in dialogues %}
+												{% if dialog.owner == profile %}
 												<li>
+													<a href="{{ dialog.get_absolute_url }}">
 													<figure>
-														<img src="images/resources/friend-avatar2.jpg" alt="">
+														<img src="{{ dialog.companion.avatar.url }}" alt="">
 														<span class="status f-online"></span>
 													</figure>
 													<div class="people-name">
-														<span>Molly cyrus</span>
+														<span>{{ dialog.companion.first_name }} {{ doialog.companion.last_name }}</span>
 													</div>
+														</a>
 												</li>
+												{% elif dialog.companion == profile %}
+												<li>
+													<a href="{{ dialog.get_absolute_url }}">
+													<figure>
+														<img src="{{ dialog.owner.avatar.url }}" alt="">
+														<span class="status f-online"></span>
+													</figure>
+													<div class="people-name">
+														<span>{{ dialog.owner.first_name }} {{ doialog.owner.last_name }}</span>
+													</div>
+														</a>
+												</li>
+												{% endif %}
+												{% endfor %}
 											</ul>
 											<div class="peoples-mesg-box">
 												<div class="conversation-head">

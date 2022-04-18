@@ -29,6 +29,7 @@ INSTALLED_APPS = [
     'profiles',
     'posts',
     'group',
+    'chat',
 ]
 
 MIDDLEWARE = [
@@ -65,6 +66,7 @@ TEMPLATES = [
     },
 ]
 
+# WSGI
 WSGI_APPLICATION = 'config.wsgi.application'
 
 

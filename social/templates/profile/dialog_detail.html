@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Friends{% endblock title %}
+{% block title %}Profile{% endblock title %}
 
 {% block content %}
 <section>
 		<div class="feature-photo">
-					{% include 'profile/profile_button_background.html' %}
+			{% include 'profile/profile_button_background.html' %}
 					<div class="col-lg-10 col-sm-9">
 						<div class="timeline-info">
 							<ul>
@@ -14,8 +14,8 @@
 								  <span>@{{ profile.slug }}</span>
 								</li>
 								<li>
-									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
-									<a class="active" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
+									<a class="active" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
+									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
 									<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
 									{% if request.user == profile.user %}
 									<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
@@ -38,19 +38,18 @@
 							<div class="col-lg-3">
 								<aside class="sidebar static">
 									<div class="widget">
-											<h4 class="widget-title">Socials</h4>
-											<ul class="socials">
-												<li class="facebook">
-													<a title="" href="#"><i class="fa fa-facebook"></i> <span>facebook</span> <ins>45 likes</ins></a>
-												</li>
-												<li class="twitter">
-													<a title="" href="#"><i class="fa fa-twitter"></i> <span>twitter</span><ins>25 likes</ins></a>
-												</li>
-												<li class="google">
-													<a title="" href="#"><i class="fa fa-google"></i> <span>google</span><ins>35 likes</ins></a>
-												</li>
-											</ul>
-										</div>
+										<h4 class="widget-title">INFORMATION</h4>
+												<div class="tab-pane fade show active" id="" >
+													<ul class="basics">
+														<li>First name: {{ profile.first_name }}</li>
+														<li>Last name: {{ profile.last_name }}</li>
+														<li>Country: <img src="{{ profile.country.flag }}"> {{ profile.get_country_display }}</li>
+														<li>Gender: {{ profile.get_gender_display }}</li>
+														<li>Date of birth: {{ profile.date_birth }}</li>
+														<li>About me: <p>{{ profile.about }}</p></li>
+													</ul>
+												</div>
+									</div>
 
 									{% include 'shortcuts.html' %} <!-- Shortcuts -->
 
@@ -122,79 +121,89 @@
 								</aside>
 							</div><!-- sidebar -->
 
-                            <div class="col-lg-6">
+							<div class="col-lg-6">
 								<div class="central-meta">
-									<div class="frnds">
-										<ul class="nav nav-tabs">
-											 <li class="nav-item"><a class="active" href="#frends" data-toggle="tab">My Friends</a> <span>{{ profile.get_friends_list.count }}</span></li>
-											{% if request.user == profile.user %}
-											 <li class="nav-item"><a class="" href="#frends-req" data-toggle="tab">Friend Requests</a><span>{{ profile.get_friends_request|length }}</span></li>
-											{% endif %}
-										</ul>
-
-										<!-- Tab panes -->
-										<div class="tab-content">
-										  <div class="tab-pane active fade show " id="frends" >
-											<ul class="nearby-contct">
-                                                {% for friend in profile.get_friends_list %}
-											<li>
-												<div class="nearly-pepls">
+									<div class="messages">
+										<h5 class="f-title"><i class="ti-bell"></i>All Messages <span class="more-options"><i class="fa fa-ellipsis-h"></i></span></h5>
+										<div class="message-box">
+											<ul class="peoples">
+												{% for dialog in dialogues %}
+												{% if dialog.owner == profile %}
+												<li>
+													<a href="{{ dialog.get_absolute_url }}">
 													<figure>
-														<a href="{{ friend.get_absolute_url }}" title=""><img src="{{ friend.avatar.url }}" alt=""></a>
+														<img src="{{ dialog.companion.avatar.url }}" alt="">
+														<span class="status f-online"></span>
 													</figure>
-													<div class="pepl-info">
-														<h4><a href="{{ friend.get_absolute_url }}" title="">{{ friend.first_name }} {{ friend.last_name }}</a></h4>
-														{% if request.user.profile == profile %}
-														<form action="{% url 'profiles:delete-friend' %}" method="post">
-															{% csrf_token %}
-														<button type="submit" class="add-butn" >Delete</button>
-														<input type="hidden" name="profile" value="{{ friend.id }}">
-															<input type="hidden" name="friend-page" value="friend-page">
-														</form>
-														{% endif %}
+													<div class="people-name">
+														<span>{{ dialog.companion.first_name }} {{ doialog.companion.last_name }}</span>
 													</div>
+														</a>
+												</li>
+												{% elif dialog.companion == profile %}
+												<li>
+													<a href="{{ dialog.get_absolute_url }}">
+													<figure>
+														<img src="{{ dialog.owner.avatar.url }}" alt="">
+														<span class="status f-online"></span>
+													</figure>
+													<div class="people-name">
+														<span>{{ dialog.owner.first_name }} {{ doialog.owner.last_name }}</span>
+													</div>
+														</a>
+												</li>
+												{% endif %}
+												{% endfor %}
+											</ul>
+											<div class="peoples-mesg-box">
+												<div class="conversation-head">
+													{% if dialog.owner == profile %}
+													<figure><img src="{{ dialog.companion.avatar.url }}" alt=""></figure>
+													<span>{{ dialog.companion.first_name }} {{ dialog.companion.last_name }}<i>online</i></span>
+													{% else %}
+													<figure><img src="{{ dialog.owner.avatar.url }}" alt=""></figure>
+													<span>{{ dialog.owner.first_name }} {{ dialog.owner.last_name }}<i>online</i></span>
+													{% endif %}
 												</div>
-											</li>
-                                                {% endfor %}
-										</ul>
-											<div class="lodmore"><button class="btn-view btn-load-more"></button></div>
-										  </div>
-											{% if request.user == profile.user %}
-											<div class="tab-pane fade" id="frends-req" >
-												<ul class="nearby-contct">
-													{% for sender in profile.get_friends_request %}
-													<li>
-														<div class="nearly-pepls">
-															<figure>
-																<a href="{{ sender.get_absolute_url }}" title=""><img src="{{ sender.avatar.url }}" alt=""></a>
-															</figure>
-															<div class="pepl-info">
-																<h4><a href="{{ sender.get_absolute_url }}" title="">{{ sender.first_name }} {{ sender.last_name }}</a></h4>
-
-																<form action="{% url 'profiles:accept-friend' %}" method="post">
-																	{% csrf_token %}
-																	<button type="submit" class="add-butn more-action">Decline</button>
-																	<input type="hidden" name="delete_request" value="delete_request">
-																	<input type="hidden" name="friend-page" value="friend-page">
-																	<input type="hidden" name="profile_sender" value="{{ sender.id }}">
-																</form>
-
-																<form action="{% url 'profiles:accept-friend' %}" method="post">
-																	{% csrf_token %}
-																	<button type="submit" class="add-butn">Accept</button>
-																	<input type="hidden" name="accept_request" value="accept_request">
-																	<input type="hidden" name="friend-page" value="friend-page">
-																	<input type="hidden" name="profile_sender" value="{{ sender.id }}">
-																</form>
-
-															</div>
-														</div>
+												<ul class="chatting-area">
+													{% for message in dialog.get_messages_sender_list %}
+													{% if dialog.owner == profile %}
+													{% if message.sender == dialog.companion %}
+													<li class="you">
+														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+														<p>{{ message.text }}</p>
 													</li>
+													{% else %}
+													<li class="me">
+														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+														<p>{{ message.text }}</p>
+													</li>
+													{% endif %}
+													{% elif dialog.companion == profile %}
+
+													{% if message.sender == dialog.owner %}
+													<li class="you">
+														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+														<p>{{ message.text }}</p>
+													</li>
+													{% else %}
+													<li class="me">
+														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+														<p>{{ message.text }}</p>
+													</li>
+													{% endif %}
+													{% endif %}
 													{% endfor %}
 												</ul>
-												<button class="btn-view btn-load-more"></button>
+												<div class="message-text-container">
+													<form action="{% url 'chat:create-message' %}" method="post">
+														{% csrf_token %}
+														{{ form_send.text }}
+														<input type="hidden" name="dialog_id" value="{{ dialog.id }}">
+														<button type="submit" title="send"><i class="fa fa-paper-plane"></i></button>
+													</form>
+												</div>
 											</div>
-											{% endif %}
 										</div>
 									</div>
 								</div>
@@ -202,46 +211,6 @@
 
 							<div class="col-lg-3">
 								<aside class="sidebar static">
-                                    <div class="widget">
-										<h4 class="widget-title">Who's follownig</h4>
-										<ul class="followers">
-											<li>
-												<figure><img src="images/resources/friend-avatar2.jpg" alt=""></figure>
-												<div class="friend-meta">
-													<h4><a href="time-line.html" title="">Kelly Bill</a></h4>
-													<a href="#" title="" class="underline">Add Friend</a>
-												</div>
-											</li>
-											<li>
-												<figure><img src="images/resources/friend-avatar4.jpg" alt=""></figure>
-												<div class="friend-meta">
-													<h4><a href="time-line.html" title="">Issabel</a></h4>
-													<a href="#" title="" class="underline">Add Friend</a>
-												</div>
-											</li>
-											<li>
-												<figure><img src="images/resources/friend-avatar6.jpg" alt=""></figure>
-												<div class="friend-meta">
-													<h4><a href="time-line.html" title="">Andrew</a></h4>
-													<a href="#" title="" class="underline">Add Friend</a>
-												</div>
-											</li>
-											<li>
-												<figure><img src="images/resources/friend-avatar8.jpg" alt=""></figure>
-												<div class="friend-meta">
-													<h4><a href="time-line.html" title="">Sophia</a></h4>
-													<a href="#" title="" class="underline">Add Friend</a>
-												</div>
-											</li>
-											<li>
-												<figure><img src="images/resources/friend-avatar3.jpg" alt=""></figure>
-												<div class="friend-meta">
-													<h4><a href="time-line.html" title="">Allen</a></h4>
-													<a href="#" title="" class="underline">Add Friend</a>
-												</div>
-											</li>
-										</ul>
-									</div><!-- who's following -->
 									<div class="widget friend-list stick-widget">
 										<h4 class="widget-title">Friends</h4>
 										<div id="searchDir"></div>

@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from chat.views import DialogListView, DialogDetailView
 
 from .views import (
     ProfileDetailView,
@@ -11,7 +12,6 @@ from .views import (
     ProfileGroupsDetailView,
     AvatarBackgroundUpdateView,
     ProfileInfoUpdateView,
-    MessagesView,
 )
 
 app_name = 'profiles'
@@ -20,7 +20,8 @@ urlpatterns = [
     path('<slug:slug>', ProfileDetailView.as_view(), name='profile-detail'),
     path('<slug:slug>/friends', ProfileFriendsDetailView.as_view(), name='profile-friends'),
     path('<slug:slug>/groups', ProfileGroupsDetailView.as_view(), name='profile-groups'),
-    path('<slug:slug>/messages', MessagesView.as_view(), name='profile-messages'),
+    path('messages/', DialogListView.as_view(), name='profile-dialog'),
+    path('messages/<int:pk>', DialogDetailView.as_view(), name='profile-dialog-detail'),
     path('relationship/send-cancel', RelationshipCreateView.as_view(), name='cancel-or-send-friend-request'),
     path('delete/friend', DeleteFriendView.as_view(), name='delete-friend'),
     path('accept/friend', AcceptFriendRequest.as_view(), name='accept-friend'),

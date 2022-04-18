@@ -8,6 +8,7 @@ urlpatterns = [
     path('profile/', include('profiles.urls')),
     path('post/', include('posts.urls')),
     path('group/', include('group.urls')),
+    path('chat/', include('chat.urls')),
 ]
 
 if settings.DEBUG:

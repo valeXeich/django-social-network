@@ -65,11 +65,6 @@ class RelationshipCreateView(View):
         return redirect('profiles:profile-detail', slug=receiver.slug)
 
 
-class MessagesView(DetailView):
-    model = Profile
-    template_name = 'profile/profile_messages.html'
-
-
 class DeleteFriendView(View):
 
     def post(self, request, *args, **kwargs):
