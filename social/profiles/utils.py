@@ -1,5 +1,7 @@
 from posts.models import Comment, Post
 from .models import Profile, Relationship
+import online_users.models
+from datetime import timedelta
 
 
 def permission_create_post(user):
@@ -24,4 +26,10 @@ def check_friend_request(user, profile):
         if user.profile == rel.receiver and rel.status == 'send':
             flag = True
     return flag
+
+
+def get_online_users():
+    user_online = online_users.models.OnlineUserActivity.get_user_activities(timedelta(seconds=60))
+    users = [online.user.profile for online in user_online]
+    return users
 

@@ -3,12 +3,15 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
+from profiles.views import SearchView
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('profile/', include('profiles.urls')),
     path('post/', include('posts.urls')),
     path('group/', include('group.urls')),
     path('chat/', include('chat.urls')),
+    path('search/', SearchView.as_view(), name='search'),
 ]
 
 if settings.DEBUG:

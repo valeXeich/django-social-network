@@ -292,7 +292,11 @@
 											<li>
 												<figure>
 													<a href="#"><img src="{{ friend.avatar.url }}" alt=""></a>
+													{% if friend in online_users %}
 													<span class="status f-online"></span>
+													{% else %}
+													<span class="status f-offline"></span>
+													{% endif %}
 												</figure>
 												<div class="friendz-meta">
 													<a href="time-line.html">{{ friend.first_name }} {{ friend.last_name }}</a>

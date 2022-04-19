@@ -25,6 +25,7 @@ INSTALLED_APPS = [
 
     'debug_toolbar',
     'django_countries',
+    'online_users',
 
     'profiles',
     'posts',
@@ -42,6 +43,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'debug_toolbar.middleware.DebugToolbarMiddleware',
+    'online_users.middleware.OnlineNowMiddleware',
 ]
 
 ROOT_URLCONF = 'config.urls'

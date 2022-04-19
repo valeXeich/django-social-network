@@ -1,13 +1,17 @@
+from django.db.models import Q
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+
+from group.models import Group
 from posts.forms import PostForm, CommentForm
+from itertools import chain
 
 from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm
 from .models import Profile, Relationship
-from .utils import permission_create_post, check_relationship, check_friend_request
+from .utils import permission_create_post, check_relationship, check_friend_request, get_online_users
 
 
 class ProfileDetailView(DetailView):
@@ -26,6 +30,7 @@ class ProfileDetailView(DetailView):
         context['check_current_user'] = permission_create_post(self.request.user)
         context['receiver'] = receiver
         context['friend_request'] = friend_request
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -129,6 +134,34 @@ class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
         context['form_ab'] = AvatarBackgroundUpdateForm
         return context
 
+
+class SearchView(ListView):
+    model = Profile
+    template_name = 'search.html'
+    context_object_name = 'search_result'
+
+    def get_queryset(self):
+        data_input = self.request.GET.get('q')
+        if len(data_input.split()) == 1:
+            result = Profile.objects.filter(
+                Q(first_name__icontains=data_input.strip(' ')) | Q(last_name__icontains=data_input.strip(' '))
+            )
+        elif len(data_input.split()) == 2:
+            group = Group.objects.filter(name__icontains=data_input)
+            data_input = data_input.split()
+            queryset = Profile.objects.filter(
+                Q(first_name__icontains=data_input[0]) & Q(last_name__icontains=data_input[1]) |
+                Q(last_name__icontains=data_input[0]) & Q(first_name__icontains=data_input[1])
+            )
+            result = list(chain(group, queryset))
+        else:
+            result = Profile.objects.all()
+        return result
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.request.user.profile
+        return context
 
 
 
