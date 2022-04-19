@@ -11,6 +11,7 @@ urlpatterns = [
     path('post/', include('posts.urls')),
     path('group/', include('group.urls')),
     path('chat/', include('chat.urls')),
+    path('accounts/', include('allauth.urls')),
     path('search/', SearchView.as_view(), name='search'),
 ]
 
