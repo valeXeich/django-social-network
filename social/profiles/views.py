@@ -7,7 +7,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
 from group.models import Group
 from posts.forms import PostForm, CommentForm
-from itertools import chain
 
 from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm
 from .models import Profile, Relationship
@@ -147,15 +146,13 @@ class SearchView(ListView):
                 Q(first_name__icontains=data_input.strip(' ')) | Q(last_name__icontains=data_input.strip(' '))
             )
         elif len(data_input.split()) == 2:
-            group = Group.objects.filter(name__icontains=data_input)
             data_input = data_input.split()
-            queryset = Profile.objects.filter(
+            result = Profile.objects.filter(
                 Q(first_name__icontains=data_input[0]) & Q(last_name__icontains=data_input[1]) |
                 Q(last_name__icontains=data_input[0]) & Q(first_name__icontains=data_input[1])
             )
-            result = list(chain(group, queryset))
         else:
-            result = Profile.objects.all()
+            result = ''
         return result
 
     def get_context_data(self, **kwargs):
