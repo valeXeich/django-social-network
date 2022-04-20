@@ -30,8 +30,14 @@
 												<a href="notifications.html" title="">Notifications</a>
 											</li>
 											<li>
-												<i class="ti-power-off"></i>
-												<a href="landing.html" title="">Logout</a>
+												<form method="post" action="{% url 'account_logout' %}">
+												  {% csrf_token %}
+												  <i class="ti-power-off"></i>
+												  {% if redirect_field_value %}
+												  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}"/>
+												  {% endif %}
+												  <button type="submit">Logout</button>
+												</form>											
 											</li>
 										</ul>
 									</div><!-- Shortcuts -->

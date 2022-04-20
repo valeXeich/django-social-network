@@ -1,7 +1,7 @@
-from posts.models import Comment, Post
-from .models import Profile, Relationship
 import online_users.models
 from datetime import timedelta
+
+from .models import Profile, Relationship
 
 
 def permission_create_post(user):
@@ -15,7 +15,7 @@ def permission_create_post(user):
 def check_relationship(user, profile):
     if user != profile.user and user not in profile.friends.all():
         try:
-            receiver = Relationship.objects.get(sender=user.profile, receiver=profile, status='send').receiver
+            Relationship.objects.get(sender=user.profile, receiver=profile, status='send').receiver
             return 'receiver'
         except Relationship.DoesNotExist:
             return 'not receiver'
@@ -32,4 +32,3 @@ def get_online_users():
     user_online = online_users.models.OnlineUserActivity.get_user_activities(timedelta(seconds=60))
     users = [online.user.profile for online in user_online]
     return users
-

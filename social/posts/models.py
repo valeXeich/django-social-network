@@ -4,6 +4,7 @@ from django.core.validators import FileExtensionValidator
 from group.models import Group
 from profiles.models import Profile
 
+
 class Post(models.Model):
     author = models.ForeignKey(Profile, verbose_name='Автор', on_delete=models.CASCADE, related_name='post')
     group = models.ForeignKey(Group, blank=True, null=True, on_delete=models.CASCADE, related_name='group_post')

@@ -1,14 +1,13 @@
 from django.db.models import Q
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, UpdateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
-from group.models import Group
 from posts.forms import PostForm, CommentForm
 
-from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm
+from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm, NewSignupForm, NewLoginForm
 from .models import Profile, Relationship
 from .utils import permission_create_post, check_relationship, check_friend_request, get_online_users
 
@@ -161,9 +160,10 @@ class SearchView(ListView):
         return context
 
 
+class AuthView(View):
 
-
-
-
-
-
+    def get(self, request, *args, **kwargs):
+        context = {
+            'signup_form': NewSignupForm,
+            'login_form': NewLoginForm}
+        return render(request, 'profile/account/auth.html', context)

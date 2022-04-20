@@ -10,8 +10,7 @@ class AvatarBackgroundGroupUpdateForm(forms.ModelForm):
 
         widgets = {
             'avatar': forms.FileInput(attrs={'type': 'file'}),
-            'background': forms.FileInput(attrs={'type': 'file'})
-        }
+            'background': forms.FileInput(attrs={'type': 'file'})}
 
 
 class GroupInfoUpdateForm(forms.ModelForm):
@@ -20,5 +19,5 @@ class GroupInfoUpdateForm(forms.ModelForm):
         fields = ['name', 'staff', 'about']
 
         widgets = {
-            'about': forms.Textarea(attrs={'rows': 4, 'id': 'textarea', 'required': 'required', 'class': 'cus-label'})
-        }
+            'about': forms.Textarea(attrs={'rows': 4, 'id': 'textarea', 'required': 'required', 'class': 'cus-label'})}
+            

@@ -11,8 +11,7 @@ class PostForm(forms.ModelForm):
         widgets = {
             'text': forms.Textarea(attrs={'rows': 2, 'placeholder': 'Write something...'}),
             'image': forms.FileInput(attrs={'type': 'file', 'class': 'fileContainer'}),
-            'video': forms.FileInput(attrs={'type': 'file', 'class': 'fileContainer'})
-        }
+            'video': forms.FileInput(attrs={'type': 'file', 'class': 'fileContainer'})}
 
 
 class CommentForm(forms.ModelForm):
@@ -21,8 +20,4 @@ class CommentForm(forms.ModelForm):
         fields = ['text']
 
         widgets = {
-            'text': forms.Textarea(attrs={'placeholder': 'Write a comment'})
-        }
-
-
-
+            'text': forms.Textarea(attrs={'placeholder': 'Write a comment'})}

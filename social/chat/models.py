@@ -20,6 +20,7 @@ class Dialog(models.Model):
     def __str__(self):
         return f'{self.owner.user.username} : {self.companion.user.username}'
 
+
 class Message(models.Model):
     dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE)
     sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='messages')
@@ -28,4 +29,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f'Dialog: {self.dialog}, sender: {self.sender.user.username}'
-

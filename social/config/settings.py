@@ -134,11 +134,28 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Allauth
 
 AUTHENTICATION_BACKENDS = [
-    # Needed to login by username in Django admin, regardless of `allauth`
     'django.contrib.auth.backends.ModelBackend',
-
-    # `allauth` specific authentication methods, such as login by e-mail
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 SITE_ID = 1
+
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = 'animegoproject@gmail.com'
+EMAIL_HOST_PASSWORD = '456789123z'
+EMAIL_USE_TLS = True 
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+ACCOUNT_FORMS = {
+    'signup': 'profiles.forms.NewSignupForm',
+    'login': 'profiles.forms.NewLoginForm',
+}
+
+ACCOUNT_ADAPTER = "profiles.adapters.MyAccountAdapter"

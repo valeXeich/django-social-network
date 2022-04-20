@@ -6,6 +6,7 @@ from django.views.generic import FormView, DeleteView, ListView
 
 from group.models import Group, GroupBan
 from profiles.models import Profile
+
 from .forms import PostForm, CommentForm
 from .models import Post, Comment
 from .utils import get_posts_for_user
@@ -85,6 +86,7 @@ class CommentView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         self.object.save()
         return super().form_valid(form)
 
+
 class LikeUpdate(View):
 
     def post(self, request, **kwargs):
@@ -104,6 +106,7 @@ class LikeUpdate(View):
             return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile.slug)
 
+
 class DislikeUpdate(View):
 
     def post(self, request, *args, **kwargs):
@@ -122,6 +125,7 @@ class DislikeUpdate(View):
         elif request.POST.get('feed'):
             return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile.slug)
+
 
 class DeletePostView(DeleteView):
     model = Post

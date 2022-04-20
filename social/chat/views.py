@@ -8,6 +8,7 @@ from profiles.models import Profile
 from .forms import SendMessageForm
 from .models import Dialog
 
+
 class DialogListView(ListView):
     """"Dialog list"""
     model = Dialog

@@ -9,3 +9,4 @@ def post_save_create_group_ban(sender, instance, created, **kwargs):
     if created:
         GroupBan.objects.create(group=instance, ban_type='ban_group')
         GroupBan.objects.create(group=instance, ban_type='comment_ban')
+        
