@@ -3,31 +3,19 @@
 										<ul class="naves">
 											<li>
 												<i class="ti-clipboard"></i>
-												<a href="newsfeed.html" title="">News feed</a>
+												<a href="{% url 'posts:news' %}" title="">News feed</a>
 											</li>
 											<li>
 												<i class="ti-files"></i>
-												<a href="fav-page.html" title="">My pages</a>
+												<a href="{{ profile.get_absolute_url }}" title="">My page</a>
 											</li>
 											<li>
 												<i class="ti-user"></i>
-												<a href="timeline-friends.html" title="">friends</a>
-											</li>
-											<li>
-												<i class="ti-image"></i>
-												<a href="timeline-photos.html" title="">images</a>
-											</li>
-											<li>
-												<i class="ti-video-camera"></i>
-												<a href="timeline-videos.html" title="">videos</a>
+												<a href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="">friends</a>
 											</li>
 											<li>
 												<i class="ti-comments-smiley"></i>
 												<a href="{% url 'profiles:profile-dialog' %}" title="">Messages</a>
-											</li>
-											<li>
-												<i class="ti-bell"></i>
-												<a href="notifications.html" title="">Notifications</a>
 											</li>
 											<li>
 												<i class="ti-power-off"></i>

@@ -24,14 +24,14 @@
 									</div>
 									<ul class="nearby-contct">
 										{% if search_result %}
-										{% for object in search_result %}
+										{% for group in search_result %}
 										<li>
 											<div class="nearly-pepls">
 												<figure>
-													<a href="{{ object.get_absolute_url }}" title=""><img src="{{ object.avatar.url }}" alt=""></a>
+													<a href="{{ group.get_absolute_url }}" title=""><img src="{{ group.avatar.url }}" alt=""></a>
 												</figure>
 												<div class="pepl-info">
-													<h4><a href="{{ profile.get_absolute_url }}" title="">{{ object.first_name }} {{ object.last_name }}</a></h4>
+													<h4><a href="{{ group.get_absolute_url }}" title="">{{ group.name }}</a></h4>
 												</div>
 											</div>
 										</li>

@@ -8,7 +8,11 @@
 				<li>
 					<figure>
 						<a href="{{ follower.0.get_absolute_url }}"><img src="{{ follower.0.avatar.url }}" alt=""></a>
+						{% if follower.0 in online_users %}
 						<span class="status f-online"></span>
+						{% else %}
+						<span class="status f-offline"></span>
+						{% endif %}
 					</figure>
 					<div class="friendz-meta">
 						<a href="{{ follower.0.get_absolute_url }}">{{ follower.0.first_name }} {{ follower.0.last_name }}</a>
@@ -26,7 +30,11 @@
 				<li>
 					<figure>
 						<a href="{{ follower.0.get_absolute_url }}"><img src="{{ follower.0.avatar.url }}" alt=""></a>
+						{% if follower.0 in online_users %}
 						<span class="status f-online"></span>
+						{% else %}
+						<span class="status f-offline"></span>
+						{% endif %}
 					</figure>
 					<div class="friendz-meta">
 						<a href="{{ follower.0.get_absolute_url }}">{{ follower.0.first_name }} {{ follower.0.last_name }}</a>
@@ -45,7 +53,11 @@
 				<li>
 					<figure>
 						<a href="{{ contact.profile.get_absolute_url }}"><img src="{{ contact.profile.avatar.url }}" alt=""></a>
+						{% if contact.profile in online_users %}
 						<span class="status f-online"></span>
+						{% else %}
+						<span class="status f-offline"></span>
+						{% endif %}
 					</figure>
 					<div class="friendz-meta">
 						<a href="{{ contact.profile.get_absolute_url }}">{{ contact.profile.first_name }} {{ contact.profile.last_name }}</a>
@@ -56,7 +68,11 @@
 				<li>
 					<figure>
 						<a href="{{ contact.profile.get_absolute_url }}"><img src="{{ contact.profile.avatar.url }}" alt=""></a>
+						{% if contact.profile in online_users %}
 						<span class="status f-online"></span>
+						{% else %}
+						<span class="status f-offline"></span>
+						{% endif %}
 					</figure>
 					<div class="friendz-meta">
 						<a href="{{ contact.profile.get_absolute_url }}">{{ contact.profile.first_name }} {{ contact.profile.last_name }}</a>

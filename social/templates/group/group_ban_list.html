@@ -53,11 +53,11 @@
 									<li>
 										<div class="nearly-pepls">
 											<figure>
-												<a href="{{ follower.get_absolute_url }}" title=""><img src="{{ profile_ban.avatar.url }}" alt=""></a>
+												<a href="{{ profile_ban.get_absolute_url }}" title=""><img src="{{ profile_ban.avatar.url }}" alt=""></a>
 											</figure>
 											<div class="pepl-info">
-												<h4><a href="{{ follower.get_absolute_url }}" title="">{{ profile_ban.first_name }} {{ profile_ban.last_name }}</a></h4>
-												<a href="{{ follower.get_absolute_url }}"><br><span class="info-title">@{{ profile_ban.slug }}</span></a>
+												<h4><a href="{{ profile_ban.get_absolute_url }}" title="">{{ profile_ban.first_name }} {{ profile_ban.last_name }}</a></h4>
+												<a href="{{ profile_ban.get_absolute_url }}"><br><span class="info-title">@{{ profile_ban.slug }}</span></a>
 												<form action="{% url 'groups:group-unban' %}" method="post">
 													{% csrf_token %}
 													<button type="submit" class="add-butn">Unban</button>

@@ -42,7 +42,9 @@
 					<div class="row" id="page-contents">
 						<div class="col-lg-3">
 							<aside class="sidebar static">
-								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+								{% if not request.user.is_anonymous %}
+									{% include 'shortcuts.html' %} <!-- Shortcuts -->
+									{% endif %}
 							</aside>
 						</div><!-- sidebar -->
 						{% if request.user.profile not in group.get_followers_ban %}
@@ -84,7 +86,7 @@
 									</div>
 								</div><!-- add post new box -->
 								{% endif %}
-								{% for post in group.group_post.all %}
+								{% for post in group.get_posts %}
 								<div class="central-meta item">
 									<div class="user-post">
 										<div class="friend-info">
@@ -150,7 +152,7 @@
 										</div>
 										<div class="coment-area">
 											<ul class="we-comet">
-												{% for comment in post.comments.all %}
+												{% for comment in post.get_comments_post %}
 												<li>
 													<div class="comet-avatar">
 														<img src="{{ comment.author.avatar.url }}" alt="">
@@ -159,7 +161,6 @@
 														<div class="coment-head">
 															<h5><a href="{{ comment.author.get_absolute_url }}" title="">{{ comment.author.first_name }} {{ comment.author.last_name }}</a></h5>
 															<span>{{ comment.created_date }}</span>
-															<a class="we-reply" href="#" title="Reply"><i class="fa fa-reply"></i></a>
 															{% if request.user.profile == comment.author or request.user in group.get_admin_and_staff %}
 															<i class="bi bi-x-circle delete-com-g icon-custom">
 																<form action="{% url 'posts:comment-delete' %}" method="post">

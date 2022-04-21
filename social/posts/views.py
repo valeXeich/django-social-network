@@ -6,12 +6,13 @@ from django.views.generic import FormView, DeleteView, ListView
 
 from group.models import Group, GroupBan
 from profiles.models import Profile
+from profiles.utils import get_online_users
 from .forms import PostForm, CommentForm
 from .models import Post, Comment
 from .utils import get_posts_for_user
 
 
-class PostFormView(FormView):
+class PostFormView(LoginRequiredMixin, FormView):
     form_class = PostForm
 
     def get_success_url(self, **kwargs):
@@ -85,7 +86,7 @@ class CommentView(LoginRequiredMixin, UserPassesTestMixin, FormView):
         self.object.save()
         return super().form_valid(form)
 
-class LikeUpdate(View):
+class LikeUpdate(LoginRequiredMixin, View):
 
     def post(self, request, **kwargs):
         post_id = request.POST.get('post_id')
@@ -104,7 +105,7 @@ class LikeUpdate(View):
             return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile.slug)
 
-class DislikeUpdate(View):
+class DislikeUpdate(LoginRequiredMixin, View):
 
     def post(self, request, *args, **kwargs):
         post_id = request.POST.get('post_id')
@@ -123,7 +124,8 @@ class DislikeUpdate(View):
             return redirect('posts:news')
         return redirect('profiles:profile-detail', slug=profile.slug)
 
-class DeletePostView(DeleteView):
+
+class DeletePostView(LoginRequiredMixin, DeleteView):
     model = Post
 
     def get_success_url(self, **kwargs):
@@ -137,7 +139,7 @@ class DeletePostView(DeleteView):
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': user.profile.slug})
 
 
-class DeleteCommentView(View):
+class DeleteCommentView(LoginRequiredMixin, View):
 
     def post(self, request, **kwargs):
         comment_id = request.POST.get('comment_id')
@@ -153,7 +155,7 @@ class DeleteCommentView(View):
         return redirect('profiles:profile-detail', slug=profile_slug)
 
 
-class NewsView(ListView):
+class NewsView(LoginRequiredMixin, ListView):
     model = Post
     template_name = 'post/news_list.html'
 
@@ -164,4 +166,5 @@ class NewsView(ListView):
         context['form_comment'] = CommentForm
         context['profile'] = self.request.user.profile
         context['posts'] = posts
+        context['online_users'] = get_online_users()
         return context
