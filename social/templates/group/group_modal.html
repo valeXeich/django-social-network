@@ -1,0 +1,44 @@
+<!--modal change background-->
+<div id="changeBackground" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Upload background</h4>
+			</div>
+			<form action="{% url 'groups:group-avatar' slug=group.slug %}" method="post" enctype="multipart/form-data">
+				<div class="modal-body">
+					{% csrf_token %}
+					{{ form_group.background }}
+					<input type="hidden" name="group_slug" value="{{ group.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+
+<!--modal change avatar-->
+<div id="changeAvatar" class="modal fade">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">Upload avatar</h4>
+			</div>
+			<form action="{% url 'groups:group-avatar' slug=group.slug %}" method="post" enctype="multipart/form-data">
+				<div class="modal-body">
+					{% csrf_token %}
+					{{ form_group.avatar }}
+					<input type="hidden" name="group_slug" value="{{ group.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>

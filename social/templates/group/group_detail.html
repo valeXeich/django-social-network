@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock title %}
+
+{% block content %}
+<section>
+	<div class="feature-photo">
+		{% include 'group/group_button_background.html' %}
+				<div class="col-lg-10 col-sm-9">
+					<div class="timeline-info">
+						<ul>
+							<li class="admin-name">
+								<h5>{{ group.name }}</h5>
+								<span>@{{ group.slug }}</span>
+							</li>
+							{% if request.user.profile not in group.get_followers_ban %}
+							<li>
+								<a class="active" href="{{ group.get_absolute_url }}" title="" data-ripple="">Wall</a>
+								<a class="" href="{% url 'groups:group-followers' slug=group.slug %}" title="" data-ripple="">Followers</a>
+								<a class="" href="{% url 'groups:group-about' slug=group.slug %}" title="" data-ripple="">About</a>
+								{% if request.user in group.get_admin_and_staff %}
+								<a class="" href="{% url 'groups:group-ban-list' slug=group.slug %}" title="" data-ripple="">Ban list</a>
+								{% endif %}
+								{% if request.user.profile == group.admin_group %}
+								<a class="" href="{% url 'groups:group-update' slug=group.slug %}" title="" data-ripple="">Settings</a>
+								{% endif %}
+							</li>
+							{% endif %}
+						</ul>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section><!-- top area -->
+
+<section>
+	<div class="gap gray-bg">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="row" id="page-contents">
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+							</aside>
+						</div><!-- sidebar -->
+						{% if request.user.profile not in group.get_followers_ban %}
+						<div class="col-lg-6">
+							<div class="loadMore">
+								{% if request.user in group.get_admin_and_staff %}
+								<div class="central-meta item">
+									<div class="new-postbox">
+										<figure>
+											<img src="{{ group.avatar.url }}" alt="">
+										</figure>
+										<div class="newpst-input">
+											<form action="{% url 'posts:form-create' %}" method="post" enctype="multipart/form-data">
+												{% csrf_token %}
+												{{ form_post.text }}
+												<div class="attachments">
+													<ul>
+														<li>
+															<i class="fa fa-image"></i>
+															<label class="fileContainer">
+																{{ form_post.image }}
+															</label>
+														</li>
+														<li>
+															<i class="fa fa-video-camera"></i>
+															<label class="fileContainer">
+																{{ form_post.video }}
+															</label>
+														</li>
+														<li>
+															<input type="hidden" name="group_post" value="group_post">
+															<input type="hidden" name="group_id" value="{{ group.id }}">
+															<button type="submit">Publish</button>
+														</li>
+													</ul>
+												</div>
+											</form>
+										</div>
+									</div>
+								</div><!-- add post new box -->
+								{% endif %}
+								{% for post in group.group_post.all %}
+								<div class="central-meta item">
+									<div class="user-post">
+										<div class="friend-info">
+											<figure>
+												<img src="{{ group.avatar.url }}" alt="">
+											</figure>
+											<div class="friend-name ">
+												<ins>
+													<a href="time-line.html" title="">{{ group.name }}</a>
+												</ins>
+												<span>{{ post.created_date }}</span>
+												{% if request.user in group.get_admin_and_staff %}
+												<form action="{% url 'posts:post-delete' pk=post.pk %}" method="post" class="delete-btn">
+													{% csrf_token %}
+													<button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+													<input type="hidden" name="group_id" value="{{ group.id }}">
+												</form>
+												{% endif %}
+											</div>
+											<div class="post-meta">
+												{% if post.image %}
+												<img src="{{ post.image.url }}" alt="">
+												{% endif %}
+												<div class="we-video-info">
+													<ul>
+														<li>
+															<form action="{% url 'posts:post-like' %}" method="post">
+																{% csrf_token %}
+																<span class="like" data-toggle="tooltip" title="like">
+																		<i class="ti-heart icon-custom"><button type="submit" class="btn-custom"></button></i>
+																	<input type="hidden" name="post_id" value="{{ post.id }}">
+																	<input type="hidden" name="group_id" value="{{ group.id }}">
+																	<ins>{{ post.liked.count }}</ins>
+																</span>
+															</form>
+														</li>
+														<li>
+															<form action="{% url 'posts:post-dislike' %}" method="post">
+																{% csrf_token %}
+																<span class="dislike" data-toggle="tooltip" title="dislike">
+																	<i class="ti-heart-broken icon-custom"><button type="submit" class="btn-custom"></button></i>
+																	<input type="hidden" name="post_id" value="{{ post.id }}">
+																	<input type="hidden" name="group_id" value="{{ group.id }}">
+																	<ins>{{ post.disliked.count }}</ins>
+																</span>
+															</form>
+														</li>
+														<li>
+																<span class="comment" data-toggle="tooltip" title="Comments">
+																	<i class="fa fa-comments-o"></i>
+																	<ins>{{ post.comments.count }}</ins>
+																</span>
+														</li>
+													</ul>
+												</div>
+												<div class="description">
+
+													<p>
+														{{ post.text }}
+													</p>
+												</div>
+											</div>
+										</div>
+										<div class="coment-area">
+											<ul class="we-comet">
+												{% for comment in post.comments.all %}
+												<li>
+													<div class="comet-avatar">
+														<img src="{{ comment.author.avatar.url }}" alt="">
+													</div>
+													<div class="we-comment">
+														<div class="coment-head">
+															<h5><a href="{{ comment.author.get_absolute_url }}" title="">{{ comment.author.first_name }} {{ comment.author.last_name }}</a></h5>
+															<span>{{ comment.created_date }}</span>
+															<a class="we-reply" href="#" title="Reply"><i class="fa fa-reply"></i></a>
+															{% if request.user.profile == comment.author or request.user in group.get_admin_and_staff %}
+															<i class="bi bi-x-circle delete-com-g icon-custom">
+																<form action="{% url 'posts:comment-delete' %}" method="post">
+																	{% csrf_token %}
+																	<button type="submit" class="btn-custom"></button>
+																	<input type="hidden" name="comment_id" value="{{ comment.id }}">
+																	<input type="hidden" name="group_id" value="{{ group.id }}">
+																</form>
+															</i>
+															{% endif %}
+														</div>
+														<p>{{ comment.text }}</p>
+													</div>
+												</li>
+												{% endfor %}
+												<li>
+													<a href="#" title="" class="showmore underline">more comments</a>
+												</li>
+												{% if request.user.is_authenticated %}
+												<li class="post-comment">
+													<div class="comet-avatar">
+														<img src="images/resources/comet-1.jpg" alt="">
+													</div>
+													{% if request.user.profile not in followers_muted %}
+													<div class="post-comt-box">
+														<form action="{% url 'posts:comment-create' %}" method="post">
+															{% csrf_token %}
+															{{ form_comment.text }}
+															<input type="hidden" name="post_id" value="{{ post.id }}">
+															<input type="hidden" name="group_slug" value="{{ group.slug }}">
+															<button type="submit">Review</button>
+														</form>
+													</div>
+													{% endif %}
+												</li>
+												{% endif %}
+											</ul>
+										</div>
+									</div>
+								</div>
+								{% endfor %}
+							</div>
+						</div><!-- centerl meta -->
+						{% elif request.user.profile not in group.get_followers_ban and group.group_post.all %}
+						<div class="col-lg-6">
+							<h4 class="text-center">No posts</h4>
+						</div>
+						{% else %}
+						<div class="col-lg-6">
+							<h4 class="text-center">You are blocked</h4>
+						</div>
+						{% endif %}
+						{% if request.user.profile not in group.get_followers_ban %}
+							{% include 'group/group_sidebar.html' %}
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+
+{% if request.user.profile == group.admin_group %}
+	{% include 'group/group_modal.html' %}
+{% endif %}
+{% endblock content %}
