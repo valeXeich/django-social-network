@@ -1,0 +1,13 @@
+<div class="widget">
+    <h4 class="widget-title">INFORMATION</h4>
+    <div class="tab-pane fade show active" id="" >
+        <ul class="basics">
+            <li>First name: {{ profile.first_name }}</li>
+            <li>Last name: {{ profile.last_name }}</li>
+            <li>Country: <img src="{{ profile.country.flag }}"> {{ profile.get_country_display }}</li>
+            <li>Gender: {{ profile.get_gender_display }}</li>
+            <li>Date of birth: {{ profile.date_birth }}</li>
+            <li>About me: <p>{{ profile.about }}</p></li>
+        </ul>
+    </div>
+</div>

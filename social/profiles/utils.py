@@ -13,12 +13,13 @@ def permission_create_post(user):
         return False
 
 def check_relationship(user, profile):
-    if user != profile.user and user not in profile.friends.all():
-        try:
-            Relationship.objects.get(sender=user.profile, receiver=profile, status='send').receiver
-            return 'receiver'
-        except Relationship.DoesNotExist:
-            return 'not receiver'
+    if not user.is_anonymous:
+        if user != profile.user and user not in profile.friends.all():
+            try:
+                Relationship.objects.get(sender=user.profile, receiver=profile, status='send').receiver
+                return 'receiver'
+            except Relationship.DoesNotExist:
+                return 'not receiver'
 
 def check_friend_request(user, profile):
     flag = False
@@ -32,3 +33,4 @@ def get_online_users():
     user_online = online_users.models.OnlineUserActivity.get_user_activities(timedelta(seconds=60))
     users = [online.user.profile for online in user_online]
     return users
+

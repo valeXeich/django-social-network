@@ -34,17 +34,22 @@ class Profile(models.Model):
         return reverse('profiles:profile-detail', kwargs={'slug': self.slug})
 
     def get_friends_list(self):
-        return self.user.friends.all()
+        friend_list = self.user.friends.select_related('user').all()
+        return friend_list
 
     def get_friends_request(self):
         sender_list = []
-        for receiver in self.receiver.all():
+        for receiver in self.receiver.select_related('sender').all():
             sender_list.append(receiver.sender)
         return sender_list
 
+    def get_follow_groups(self):
+        follow_groups = self.follower_groups.prefetch_related('followers').all()
+        return follow_groups
+
     def get_post_list(self):
         post_list = []
-        for post in self.post.all():
+        for post in self.post.select_related('group').prefetch_related('liked', 'disliked', 'comments').all():
             if post.group == None:
                 post_list.append(post)
         return post_list

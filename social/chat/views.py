@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -5,11 +6,12 @@ from django.views.generic import ListView, DetailView, FormView
 from django.db.models import Q
 
 from profiles.models import Profile
+from profiles.utils import get_online_users
 from .forms import SendMessageForm
 from .models import Dialog
 
 
-class DialogListView(ListView):
+class DialogListView(LoginRequiredMixin, ListView):
     """"Dialog list"""
     model = Dialog
     template_name = 'profile/profile_messages.html'
@@ -24,10 +26,11 @@ class DialogListView(ListView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         context['profile'] = self.request.user.profile
+        context['online_users'] = get_online_users()
         return context
 
 
-class DialogDetailView(DetailView):
+class DialogDetailView(LoginRequiredMixin, DetailView):
     """"Dialog room"""
     model = Dialog
     template_name = 'profile/dialog_detail.html'
@@ -42,6 +45,7 @@ class DialogDetailView(DetailView):
         context['profile'] = profile
         context['form_send'] = SendMessageForm
         context['dialogues'] = dialogues
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -59,7 +63,7 @@ class CreateOrGetDialog(View):
         return redirect('profiles:profile-dialog-detail', pk=dialog.pk)
 
 
-class CreateMessageView(FormView):
+class CreateMessageView(LoginRequiredMixin, FormView):
     """"Send messages"""
     form_class = SendMessageForm
 

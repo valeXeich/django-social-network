@@ -10,6 +10,7 @@ from .views import (
     GroupUnBan,
     GroupBanList,
     GroupAboutView,
+    SearchGroupView,
 )
 
 app_name = 'groups'
@@ -24,4 +25,5 @@ urlpatterns = [
     path('ban/list/<slug:slug>', GroupBanList.as_view(), name='group-ban-list'),
     path('ban/', GroupBanView.as_view(), name='group-ban'),
     path('unban/', GroupUnBan.as_view(), name='group-unban'),
+    path('search/', SearchGroupView.as_view(), name='search-group'),
 ]

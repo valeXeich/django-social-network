@@ -3,7 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from profiles.views import AuthView, SearchView
+from profiles.views import AuthView, SearchProfileView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -13,7 +13,7 @@ urlpatterns = [
     path('chat/', include('chat.urls')),
     path('accounts/', include('allauth.urls')),
     path('auth/', AuthView.as_view(), name='auth'),
-    path('search/', SearchView.as_view(), name='search'),
+    path('search/', SearchProfileView.as_view(), name='search'),
 ]
 
 if settings.DEBUG:
@@ -24,4 +24,3 @@ if settings.DEBUG:
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-    

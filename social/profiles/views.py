@@ -15,6 +15,7 @@ from .utils import permission_create_post, check_relationship, check_friend_requ
 class ProfileDetailView(DetailView):
     """"Main Profile page"""
     model = Profile
+    queryset = Profile.objects.select_related('user').prefetch_related('post').all()
     template_name = 'profile/profile_detail.html'
     context_object_name = 'profile'
 
@@ -41,6 +42,7 @@ class ProfileFriendsDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_ab'] = AvatarBackgroundUpdateForm
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -52,6 +54,7 @@ class ProfileGroupsDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_ab'] = AvatarBackgroundUpdateForm
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -130,10 +133,11 @@ class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_ab'] = AvatarBackgroundUpdateForm
+        context['online_users'] = get_online_users()
         return context
 
 
-class SearchView(ListView):
+class SearchProfileView(ListView):
     model = Profile
     template_name = 'search.html'
     context_object_name = 'search_result'
@@ -150,13 +154,12 @@ class SearchView(ListView):
                 Q(first_name__icontains=data_input[0]) & Q(last_name__icontains=data_input[1]) |
                 Q(last_name__icontains=data_input[0]) & Q(first_name__icontains=data_input[1])
             )
-        else:
-            result = ''
         return result
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['profile'] = self.request.user.profile
+        context['online_users'] = get_online_users()
         return context
 
 

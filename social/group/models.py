@@ -23,7 +23,7 @@ class Group(models.Model):
         return reverse('groups:group-detail', kwargs={'slug': self.slug})
 
     def get_admin_and_staff(self):
-        data = [profile.user for profile in self.staff.all()]
+        data = [profile.user for profile in self.staff.select_related('user').all()]
         data.append(self.admin_group.user)
         return data
 
@@ -42,6 +42,10 @@ class Group(models.Model):
     def get_followers_ban(self):
         group_ban = GroupBan.objects.get(group=self, ban_type='ban_group')
         return group_ban.follower.all()
+
+    def get_posts(self):
+        group_posts = self.group_post.select_related('author', 'group').prefetch_related('liked', 'disliked', 'comments').all()
+        return group_posts
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name)

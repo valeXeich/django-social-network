@@ -42,7 +42,9 @@
 					<div class="row" id="page-contents">
 						<div class="col-lg-3">
 							<aside class="sidebar static">
-								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+								{% if not request.user.is_anonymous %}
+									{% include 'shortcuts.html' %} <!-- Shortcuts -->
+									{% endif %}
 							</aside>
 						</div><!-- sidebar -->
 						{% if request.user.profile not in group.get_followers_ban %}

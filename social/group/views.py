@@ -3,10 +3,11 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, ListView
 
 from posts.forms import PostForm, CommentForm
 from profiles.models import Profile
+from profiles.utils import get_online_users
 from .models import Group, GroupBan
 from .forms import AvatarBackgroundGroupUpdateForm, GroupInfoUpdateForm
 
@@ -14,6 +15,7 @@ from .forms import AvatarBackgroundGroupUpdateForm, GroupInfoUpdateForm
 class GroupDetailView(DetailView):
     model = Group
     template_name = 'group/group_detail.html'
+    queryset = Group.objects.select_related('admin_group').prefetch_related('followers').all()
     context_object_name = 'group'
 
     def get_context_data(self, **kwargs):
@@ -25,7 +27,8 @@ class GroupDetailView(DetailView):
         context['form_post'] = PostForm
         context['form_comment'] = CommentForm
         context['form_group'] = AvatarBackgroundGroupUpdateForm
-        context['followers_muted'] = group_ban_review.follower.all()
+        context['followers_muted'] = group_ban_review.follower.select_related('author_comments').all()
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -56,6 +59,7 @@ class GroupInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         if self.request.user.is_authenticated:
             context['profile'] = self.request.user.profile
         context['form_group'] = AvatarBackgroundGroupUpdateForm
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -70,6 +74,7 @@ class GroupFollowersView(DetailView):
         if self.request.user.is_authenticated:
             context['profile'] = self.request.user.profile
         context['followers_muted'] = group_ban_review.follower.all()
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -86,6 +91,7 @@ class GroupBanList(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
             context['profile'] = self.request.user.profile
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -97,6 +103,7 @@ class GroupAboutView(DetailView):
         context = super().get_context_data(**kwargs)
         if self.request.user.is_authenticated:
             context['profile'] = self.request.user.profile
+        context['online_users'] = get_online_users()
         return context
 
 
@@ -153,3 +160,20 @@ class GroupUnBan(View):
             group_ban.follower.remove(profile)
             return redirect('groups:group-ban-list', slug=group.slug)
         return redirect('groups:group-followers', slug=group.slug)
+
+
+class SearchGroupView(ListView):
+    model = Group
+    template_name = 'search_group.html'
+    context_object_name = 'search_result'
+
+    def get_queryset(self):
+        data_input = self.request.GET.get('search_group')
+        queryset = Group.objects.filter(name__icontains=data_input)
+        return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['profile'] = self.request.user.profile
+        context['online_users'] = get_online_users()
+        return context
