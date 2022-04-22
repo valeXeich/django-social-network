@@ -1,4 +1,8 @@
 def get_posts_for_user(profile):
+    """"
+     News feed of posts:
+     friends, groups
+     """
     profile_post = []
     for post in profile.post.prefetch_related('liked', 'disliked', 'comments').filter(group=None):
         profile_post.append(post)

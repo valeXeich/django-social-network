@@ -6,6 +6,7 @@ from django_countries.fields import CountryField
 
 
 class Profile(models.Model):
+    """"User profile"""
     GENDER_CHOICES = (
         ('Male', 'Male'),
         ('Female', 'Female'),
@@ -22,7 +23,6 @@ class Profile(models.Model):
     avatar = models.ImageField(default='avatars/avatar.png', upload_to='avatars/')
     background = models.ImageField(default='background/background.png', upload_to='background/')
     friends = models.ManyToManyField(User, blank=True, related_name='friends')
-    is_online = models.BooleanField(default=False)
     slug = models.SlugField(unique=True, blank=True)
     updated_date = models.DateTimeField(auto_now=True)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -34,20 +34,24 @@ class Profile(models.Model):
         return reverse('profiles:profile-detail', kwargs={'slug': self.slug})
 
     def get_friends_list(self):
+        """"Friend list"""
         friend_list = self.user.friends.select_related('user').all()
         return friend_list
 
     def get_friends_request(self):
+        """"Friendship requests"""
         sender_list = []
         for receiver in self.receiver.select_related('sender').all():
             sender_list.append(receiver.sender)
         return sender_list
 
     def get_follow_groups(self):
+        """"Get the groups you follow"""
         follow_groups = self.follower_groups.prefetch_related('followers').all()
         return follow_groups
 
     def get_post_list(self):
+        """"List of user posts"""
         post_list = []
         for post in self.post.select_related('group').prefetch_related('liked', 'disliked', 'comments').all():
             if post.group == None:
@@ -60,6 +64,7 @@ class Profile(models.Model):
 
 
 class Relationship(models.Model):
+    """"Friendship request"""
     STATUS_CHOICES = (
         ('send', 'send'),
         ('accepted', 'accepted')

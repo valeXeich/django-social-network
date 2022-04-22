@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -7,12 +7,13 @@ from django.db.models import Q
 
 from profiles.models import Profile
 from profiles.utils import get_online_users
+
 from .forms import SendMessageForm
 from .models import Dialog
 
 
 class DialogListView(LoginRequiredMixin, ListView):
-    """"Dialog list"""
+    """"User Dialogs"""
     model = Dialog
     template_name = 'profile/profile_messages.html'
     context_object_name = 'dialogues'
@@ -30,11 +31,16 @@ class DialogListView(LoginRequiredMixin, ListView):
         return context
 
 
-class DialogDetailView(LoginRequiredMixin, DetailView):
-    """"Dialog room"""
+class DialogDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+    """"Dialogue room"""
     model = Dialog
     template_name = 'profile/dialog_detail.html'
     context_object_name = 'dialog'
+
+    def test_func(self):
+        dialog = self.get_object()
+        profile = self.request.user.profile
+        return profile == dialog.owner or profile == dialog.companion
 
     def get_context_data(self, *args, **kwargs):
         profile = self.request.user.profile
@@ -49,8 +55,8 @@ class DialogDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
-class CreateOrGetDialog(View):
-    """"Create or get dialog"""
+class CreateOrGetDialog(LoginRequiredMixin, View):
+    """"View to get dialog or create"""
     def post(self, request, *args, **kwargs):
         profile_id = request.POST.get('profile_id')
         profile = Profile.objects.get(id=profile_id)
@@ -64,7 +70,7 @@ class CreateOrGetDialog(View):
 
 
 class CreateMessageView(LoginRequiredMixin, FormView):
-    """"Send messages"""
+    """"Sending a message to an interlocutor"""
     form_class = SendMessageForm
 
     def get_success_url(self, **kwargs):

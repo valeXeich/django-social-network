@@ -5,10 +5,12 @@ from profiles.models import Profile
 
 
 class Dialog(models.Model):
+    """"Room with two people"""
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='dialogues')
     companion = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
     def get_messages_sender_list(self):
+        """"Receiving dialog messages"""
         messages_list = [message_owner for message_owner in self.owner.messages.filter(dialog=self)]
         for message_companion in self.companion.messages.all():
             messages_list.append(message_companion)
@@ -22,6 +24,7 @@ class Dialog(models.Model):
 
 
 class Message(models.Model):
+    """"Dialog messages"""
     dialog = models.ForeignKey(Dialog, on_delete=models.CASCADE)
     sender = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='messages')
     text = models.TextField()

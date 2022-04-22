@@ -1,4 +1,5 @@
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views import View
@@ -9,7 +10,7 @@ from posts.forms import PostForm, CommentForm
 
 from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm, NewSignupForm, NewLoginForm
 from .models import Profile, Relationship
-from .utils import permission_create_post, check_relationship, check_friend_request, get_online_users
+from .utils import check_relationship, check_friend_request, get_online_users
 
 
 class ProfileDetailView(DetailView):
@@ -26,7 +27,6 @@ class ProfileDetailView(DetailView):
         context['form_post'] = PostForm
         context['form_comment'] = CommentForm
         context['form_ab'] = AvatarBackgroundUpdateForm
-        context['check_current_user'] = permission_create_post(self.request.user)
         context['receiver'] = receiver
         context['friend_request'] = friend_request
         context['online_users'] = get_online_users()
@@ -34,7 +34,7 @@ class ProfileDetailView(DetailView):
 
 
 class ProfileFriendsDetailView(DetailView):
-    """"Profile friends page"""
+    """"Profile friends list page"""
     model = Profile
     template_name = 'profile/profile_friends.html'
     context_object_name = 'profile'
@@ -47,6 +47,7 @@ class ProfileFriendsDetailView(DetailView):
 
 
 class ProfileGroupsDetailView(DetailView):
+    """"Profile group list page"""
     model = Profile
     template_name = 'profile/profile_groups.html'
     context_object_name = 'profile'
@@ -58,8 +59,8 @@ class ProfileGroupsDetailView(DetailView):
         return context
 
 
-class RelationshipCreateView(View):
-    """"Cancel and send friend request"""
+class RelationshipCreateView(LoginRequiredMixin, View):
+    """"Sending and deleting friendship requests"""
 
     def post(self, request, *args, **kwargs):
         receiver_id = request.POST.get('receiver_id')
@@ -71,7 +72,8 @@ class RelationshipCreateView(View):
         return redirect('profiles:profile-detail', slug=receiver.slug)
 
 
-class DeleteFriendView(View):
+class DeleteFriendView(LoginRequiredMixin, View):
+    """"Remove from friends"""
 
     def post(self, request, *args, **kwargs):
         current_user = request.user.profile
@@ -85,7 +87,8 @@ class DeleteFriendView(View):
         return redirect('profiles:profile-detail', slug=friend_delete.slug)
 
 
-class AcceptFriendRequest(View):
+class AcceptFriendRequest(LoginRequiredMixin, View):
+    """"Accept a friendship request"""
 
     def post(self, request, *args, **kwargs):
         sender_id = request.POST.get('profile_sender')
@@ -104,10 +107,12 @@ class AcceptFriendRequest(View):
 
 
 class AvatarBackgroundUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """"Updating the avatar and background profile"""
     form_class = AvatarBackgroundUpdateForm
     model = Profile
 
     def test_func(self):
+        """"Only the profile owner access"""
         profile = self.get_object()
         return profile.user == self.request.user
 
@@ -117,12 +122,14 @@ class AvatarBackgroundUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
 
 
 class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    """"Updating user information"""
     form_class = ProfileInfoUpdateForm
     model = Profile
     template_name = 'profile/profile_about.html'
     context_object_name = 'profile'
 
     def test_func(self):
+        """"Only the profile owner access"""
         profile = self.get_object()
         return profile.user == self.request.user
 
@@ -138,6 +145,7 @@ class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
 
 
 class SearchProfileView(ListView):
+    """"Search for users"""
     model = Profile
     template_name = 'search.html'
     context_object_name = 'search_result'
@@ -164,9 +172,13 @@ class SearchProfileView(ListView):
 
 
 class AuthView(View):
+    """"Authorization and registration"""
 
     def get(self, request, *args, **kwargs):
         context = {
             'signup_form': NewSignupForm,
-            'login_form': NewLoginForm}
-        return render(request, 'profile/account/auth.html', context)
+            'login_form': NewLoginForm
+        }
+        if request.user.is_anonymous:
+            return render(request, 'profile/account/auth.html', context)
+        return HttpResponse(status=403)

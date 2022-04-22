@@ -14,6 +14,7 @@ from .utils import get_posts_for_user
 
 
 class PostFormView(LoginRequiredMixin, FormView):
+    """"Creating post"""
     form_class = PostForm
 
     def get_success_url(self, **kwargs):
@@ -46,9 +47,11 @@ class PostFormView(LoginRequiredMixin, FormView):
 
 
 class CommentView(LoginRequiredMixin, UserPassesTestMixin, FormView):
+    """"Creating commentary"""
     form_class = CommentForm
 
     def test_func(self):
+        """"Ban on writing comments, for those on the ban list"""
         profile = self.request.user.profile
         if self.request.POST.get('group_slug'):
             group_slug = self.request.POST.get('group_slug')
@@ -89,6 +92,7 @@ class CommentView(LoginRequiredMixin, UserPassesTestMixin, FormView):
 
 
 class LikeUpdate(LoginRequiredMixin, View):
+    """"Like and remove"""
 
     def post(self, request, **kwargs):
         post_id = request.POST.get('post_id')
@@ -109,6 +113,7 @@ class LikeUpdate(LoginRequiredMixin, View):
 
 
 class DislikeUpdate(LoginRequiredMixin, View):
+    """"Dislike and remove"""
 
     def post(self, request, *args, **kwargs):
         post_id = request.POST.get('post_id')
@@ -128,8 +133,24 @@ class DislikeUpdate(LoginRequiredMixin, View):
         return redirect('profiles:profile-detail', slug=profile.slug)
 
 
-class DeletePostView(LoginRequiredMixin, DeleteView):
+class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    """"Delete post"""
     model = Post
+
+    def test_func(self):
+        """"
+        Only those in admin and staff can delete group post
+        """
+        post = self.get_object()
+        profile = self.request.user.profile
+        if self.request.POST.get('group_id'):
+            group_id = self.request.POST.get('group_id')
+            group = Group.objects.get(id=group_id)
+            if profile.user in group.get_admin_and_staff():
+                return True
+            else:
+                return False
+        return profile == post.author
 
     def get_success_url(self, **kwargs):
         user = self.request.user
@@ -142,7 +163,24 @@ class DeletePostView(LoginRequiredMixin, DeleteView):
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': user.profile.slug})
 
 
-class DeleteCommentView(LoginRequiredMixin, View):
+class DeleteCommentView(LoginRequiredMixin, UserPassesTestMixin, View):
+    """"Delete comment"""
+
+    def test_func(self):
+        """"
+        Admin and staff can delete comments on a group post
+        """
+        comment_id = self.request.POST.get('comment_id')
+        comment = Comment.objects.get(id=comment_id)
+        profile = self.request.user.profile
+        if self.request.POST.get('group_id'):
+            group_id = self.request.POST.get('group_id')
+            group = Group.objects.get(id=group_id)
+            if profile.user in group.get_admin_and_staff():
+                return True
+            else:
+                return False
+        return profile == comment.author
 
     def post(self, request, **kwargs):
         comment_id = request.POST.get('comment_id')
@@ -159,6 +197,7 @@ class DeleteCommentView(LoginRequiredMixin, View):
 
 
 class NewsView(LoginRequiredMixin, ListView):
+    """"News feed"""
     model = Post
     template_name = 'post/news_list.html'
 

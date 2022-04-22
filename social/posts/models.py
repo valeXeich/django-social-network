@@ -6,6 +6,7 @@ from profiles.models import Profile
 
 
 class Post(models.Model):
+    """"Creating posts"""
     author = models.ForeignKey(Profile, verbose_name='Автор', on_delete=models.CASCADE, related_name='post')
     group = models.ForeignKey(Group, blank=True, null=True, on_delete=models.CASCADE, related_name='group_post')
     liked = models.ManyToManyField(Profile, verbose_name='Лайки', default=None, related_name='likes')
@@ -25,6 +26,7 @@ class Post(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
 
     def get_comments_post(self):
+        """"Getting comments on a post"""
         return self.comments.select_related('author', 'group', 'post').all()
 
     def __str__(self):
@@ -32,6 +34,7 @@ class Post(models.Model):
 
 
 class Comment(models.Model):
+    """"Creating comments"""
     author = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='author_comments')
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='comments')
     group = models.ForeignKey(Group, on_delete=models.CASCADE, blank=True, null=True, related_name='group_comments')

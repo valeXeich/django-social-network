@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Friends{% endblock title %}
+{% block title %}Profile{% endblock title %}
 
 {% block content %}
 <section>
@@ -16,10 +16,8 @@
 								<li>
 									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
 									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
-									<a class="active" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
-									{% if request.user == profile.user %}
-									<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
-									{% endif %}
+									<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
+									<a class="active" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
 								</li>
 							</ul>
 						</div>
@@ -38,57 +36,40 @@
 							<div class="col-lg-3">
 								<aside class="sidebar static">
 									{% include 'profile/information.html' %}
-									{% if not request.user.is_anonymous %}
 									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-									{% endif %}
 								</aside>
 							</div><!-- sidebar -->
 
-                            <div class="col-lg-6">
+							<div class="col-lg-6">
 								<div class="central-meta">
-									<div class="groups">
-										<span><i class="fa fa-users"></i> Groups</span>
-									</div>
-									<div class="right-button">
-										<a href="{% url 'groups:create-group' %}"><button class="btn btn-primary btn-sm">Create Group</button></a>
-									</div>
-									<ul class="nearby-contct">
-										<form action="{% url 'groups:search-group' %}" method="get" class="d-flex search-group">
-											<input class="form-control mr-2" type="search" placeholder="Search group" aria-label="Search" name="search_group">
-											<button class="btn btn-outline-primary" type="submit">Search</button>
-										</form>
-										{% for group in profile.get_follow_groups %}
-										<li>
-											<div class="nearly-pepls">
-												<figure>
-													<a href="{{ group.get_absolute_url }}" title=""><img src="{{ group.avatar.url }}" alt=""></a>
-												</figure>
-												<div class="pepl-info">
-													<h4><a href="{{ group.get_absolute_url }}" title="">{{ group.name }} </a></h4>
-													<em>{{ group.followers.count }} Members</em>
-													{% if request.user.profile in group.followers.all %}
-													<form action="{% url 'groups:group-follow' %}" method="post">
-														{% csrf_token %}
-														<button type="submit" class="add-butn">Unfollow</button>
-														<input type="hidden" name="group_id" value="{{ group.id }}">
-														<input type="hidden" name="unfollow" value="unfollow">
-														<input type="hidden" name="from_profile" value="{{ profile.slug }}">
-													</form>
-													{% else %}
-													<form action="{% url 'groups:group-follow' %}" method="post">
-														{% csrf_token %}
-														<button type="submit" class="add-butn">Follow</button>
-														<input type="hidden" name="group_id" value="{{ group.id }}">
-														<input type="hidden" name="follow" value="follow">
-														<input type="hidden" name="from_profile" value="{{ profile.slug }}">
-													</form>
-													{% endif %}
-												</div>
+									<div class="editing-info">
+										<h5 class="f-title"><i class="ti-info-alt"></i> Create Group</h5>
+
+										<form action="{% url 'groups:create-group' %}" method="post">
+											{% csrf_token %}
+											<div class="form-group half">
+											  {{ form.name }}
+											  <label class="control-label" for="input">Group name</label><i class="mtrl-select"></i>
 											</div>
-										</li>
-										{% endfor %}
-									</ul>
-								</div><!-- photos -->
+											<div class="form-group">
+											  {{ form.about }}
+												<label class="control-label" for="input">About</label><i class="mtrl-select"></i>
+											</div>
+											<div class="form-group">
+												<p class="info-title">Upload avatar</p>
+											  {{ form.avatar }}
+											</div>
+											<div class="form-group">
+												<p class="info-title">Upload background</p>
+												{{ form.background }}
+											</div>
+											<div class="submit-btns">
+												<button type="submit" class="mtr-btn"><span>Create</span></button>
+												<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+											</div>
+										</form>
+									</div>
+								</div>
 							</div><!-- centerl meta -->
 
 							<div class="col-lg-3">

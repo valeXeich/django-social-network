@@ -3777,6 +3777,7 @@ button.add-butn.more-action {
 .groups > span {
     font-size: 20px;
     font-weight: 400;
+    float: left;
 }
 
 
@@ -10091,3 +10092,12 @@ aside.sidebar.full-style {
 .search-group {
     margin-bottom: 20px;
 }
+
+.right-button {
+    float: right;
+}
+
+.left-button {
+    float: left;
+}
+

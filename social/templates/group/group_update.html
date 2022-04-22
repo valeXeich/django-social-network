@@ -59,11 +59,17 @@
 												{{ form.about }}
 											  <label class="control-label" style="padding-top: 10px;" for="textarea">About group</label><i class="mtrl-select"></i>
 											</div>
-											<div class="submit-btns">
+											<div class="left-button">
 												<button type="submit" class="mtr-btn"><span>Update</span></button>
 												<input type="hidden" name="group_slug" value="{{ group.slug }}">
 											</div>
 										</form>
+										<div class="right-button">
+											<form action="{% url 'groups:delete-group' slug=group.slug %}" method="post">
+												{% csrf_token %}
+												<button type="submit" class="mtr-btn"><span>Delete Group</span></button>
+											</form>
+										</div>
 									</div>
 								</div>
 							</div><!-- centerl meta -->
