@@ -1,19 +1,22 @@
 from django.db.models import Q
-from django.http import HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, UpdateView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
+from allauth.account.views import LoginView, SignupView
+
 from posts.forms import PostForm, CommentForm
+from posts.models import Post
 
 from .forms import AvatarBackgroundUpdateForm, ProfileInfoUpdateForm, NewSignupForm, NewLoginForm
+from .mixins import CustomContextMixin
 from .models import Profile, Relationship
-from .utils import check_relationship, check_friend_request, get_online_users
+from .utils import check_relationship, check_friend_request
 
 
-class ProfileDetailView(DetailView):
+class ProfileDetailView(CustomContextMixin, DetailView):
     """"Main Profile page"""
     model = Profile
     queryset = Profile.objects.select_related('user').prefetch_related('post').all()
@@ -23,17 +26,18 @@ class ProfileDetailView(DetailView):
     def get_context_data(self, **kwargs):
         receiver = check_relationship(user=self.request.user, profile=kwargs['object'])
         friend_request = check_friend_request(user=self.request.user, profile=kwargs['object'])
+        profile = self.request.user.profile
         context = super().get_context_data(**kwargs)
         context['form_post'] = PostForm
         context['form_comment'] = CommentForm
         context['form_ab'] = AvatarBackgroundUpdateForm
         context['receiver'] = receiver
         context['friend_request'] = friend_request
-        context['online_users'] = get_online_users()
+        context['posts'] = Post.objects.select_related('author', 'group').filter(author=profile, group=None).order_by('-created_date')
         return context
 
 
-class ProfileFriendsDetailView(DetailView):
+class ProfileFriendsDetailView(CustomContextMixin, DetailView):
     """"Profile friends list page"""
     model = Profile
     template_name = 'profile/profile_friends.html'
@@ -42,11 +46,10 @@ class ProfileFriendsDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_ab'] = AvatarBackgroundUpdateForm
-        context['online_users'] = get_online_users()
         return context
 
 
-class ProfileGroupsDetailView(DetailView):
+class ProfileGroupsDetailView(CustomContextMixin, DetailView):
     """"Profile group list page"""
     model = Profile
     template_name = 'profile/profile_groups.html'
@@ -55,7 +58,6 @@ class ProfileGroupsDetailView(DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_ab'] = AvatarBackgroundUpdateForm
-        context['online_users'] = get_online_users()
         return context
 
 
@@ -82,7 +84,7 @@ class DeleteFriendView(LoginRequiredMixin, View):
         current_user.friends.remove(friend_delete.user)
         friend_delete.friends.remove(current_user.user)
         current_user.save()
-        if request.POST.get('friend-page') == 'friend-page':
+        if request.POST.get('friend-page'):
             return redirect('profiles:profile-friends', slug=current_user.slug)
         return redirect('profiles:profile-detail', slug=friend_delete.slug)
 
@@ -95,13 +97,13 @@ class AcceptFriendRequest(LoginRequiredMixin, View):
         receiver = request.user.profile
         sender = Profile.objects.get(id=sender_id)
         rel = Relationship.objects.get(sender=sender, receiver=receiver, status='send')
-        if request.POST.get('delete_request') == 'delete_request':
+        if request.POST.get('delete_request'):
             rel.delete()
-        elif request.POST.get('accept_request') == 'accept_request':
+        elif request.POST.get('accept_request'):
             rel.status = 'accepted'
             rel.save()
             rel.delete()
-        if request.POST.get('friend-page') == 'friend-page':
+        if request.POST.get('friend-page'):
             return redirect('profiles:profile-friends', slug=receiver.slug)
         return redirect('profiles:profile-detail', slug=sender.slug)
 
@@ -121,7 +123,7 @@ class AvatarBackgroundUpdateView(LoginRequiredMixin, UserPassesTestMixin, Update
         return reverse_lazy('profiles:profile-detail', kwargs={'slug': profile_slug})
 
 
-class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, CustomContextMixin, UpdateView):
     """"Updating user information"""
     form_class = ProfileInfoUpdateForm
     model = Profile
@@ -140,11 +142,10 @@ class ProfileInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView)
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form_ab'] = AvatarBackgroundUpdateForm
-        context['online_users'] = get_online_users()
         return context
 
 
-class SearchProfileView(ListView):
+class SearchProfileView(CustomContextMixin, ListView):
     """"Search for users"""
     model = Profile
     template_name = 'search.html'
@@ -167,18 +168,16 @@ class SearchProfileView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['profile'] = self.request.user.profile
-        context['online_users'] = get_online_users()
         return context
 
 
-class AuthView(View):
-    """"Authorization and registration"""
+class CustomLoginView(LoginView):
+    template_name = 'profile/account/auth.html'
+    form_class = NewLoginForm
 
-    def get(self, request, *args, **kwargs):
-        context = {
-            'signup_form': NewSignupForm,
-            'login_form': NewLoginForm
-        }
-        if request.user.is_anonymous:
-            return render(request, 'profile/account/auth.html', context)
-        return HttpResponse(status=403)
+
+class CustomSignUpView(SignupView):
+    template_name = 'profile/account/register.html'
+    form_class = NewSignupForm
+
+

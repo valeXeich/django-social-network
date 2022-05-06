@@ -159,3 +159,4 @@ ACCOUNT_FORMS = {
 }
 
 ACCOUNT_ADAPTER = "profiles.adapters.MyAccountAdapter"
+

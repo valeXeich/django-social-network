@@ -93,16 +93,16 @@
 									<h4 class="text-center">User has no posts</h4>
 									{% endif %}
 
-									{% for post in profile.get_post_list %}
+									{% for post in posts %}
 									<div class="central-meta item">
 										<div class="user-post">
 											<div class="friend-info">
 												<figure>
-													<img src="{{ profile.avatar.url }}" alt="">
+													<img src="{{ post.author.avatar.url }}" alt="">
 												</figure>
 												<div class="friend-name ">
 													<ins>
-														<a href="time-line.html" title="">{{ profile.first_name }} {{ profile.last_name }}</a>
+														<a href="time-line.html" title="">{{ post.author.first_name }} {{ post.author.last_name }}</a>
 													</ins>
 													<span>{{ post.created_date }}</span>
 													{% if request.user.profile == post.author %}

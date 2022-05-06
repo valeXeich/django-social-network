@@ -52,11 +52,8 @@ class Profile(models.Model):
 
     def get_post_list(self):
         """"List of user posts"""
-        post_list = []
-        for post in self.post.select_related('group').prefetch_related('liked', 'disliked', 'comments').all():
-            if post.group == None:
-                post_list.append(post)
-        return post_list
+        post = self.post.select_related('group').prefetch_related('liked', 'disliked', 'comments').filter(group=None).order_by('-created_date')
+        return post
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.user.username)

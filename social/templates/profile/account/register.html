@@ -19,25 +19,40 @@
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="login-reg-bg">
-					<div class="log-reg-area sign">
-						<h2 class="log-title">Login</h2>
-						<form method="post" action="{% url 'login' %}">
+					<div class="log-reg-area">
+						<h2 class="log-title">Register</h2>
+						<a style="color:#088dcd" href="{% url 'login' %}">Have account?</a>
+						<form method="post" action="{% url 'signup' %}">
 							{% csrf_token %}
 							<div class="form-group">	
-							  {{ form.login }}
-							  <label class="control-label" for="input">{{ form.login.label }}</label><i class="mtrl-select"></i>
+							  {{ form.first_name }}
+							  <label class="control-label" for="signup_input_first_name">{{ form.first_name.label }}</label><i class="mtrl-select"></i>
 							</div>
 							<div class="form-group">	
-							  {{ form.password }}
-							  <label class="control-label" for="login_input_password">{{ form.password.label }}</label><i class="mtrl-select"></i>
+							  {{ form.last_name }}
+							  <label class="control-label" for="signup_input_last_name">{{ form.last_name.label }}</label><i class="mtrl-select"></i>
+							</div>
+							<div class="form-group">	
+							  {{ form.username }}
+							  <label class="control-label" for="input">{{ form.username.label }}</label><i class="mtrl-select"></i>
+							</div>
+							<div class="form-group">	
+							  {{ form.email }}
+							  <label class="control-label" for="input">{{ form.email.label }}</label><i class="mtrl-select"></i>
+							</div>
+							<div class="form-group">	
+							  {{ form.password1 }}
+							  <label class="control-label" for="input">{{ form.password1.label }}</label><i class="mtrl-select"></i>
+							</div>
+							<div class="form-group">	
+							  {{ form.password2 }}
+							  <label class="control-label" for="input">{{ form.password2.label }}</label><i class="mtrl-select"></i>
 							</div>
 							{% if redirect_field_value %}
       						<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
       						{% endif %}
-							<a href="{% url 'account_reset_password' %}" class="forgot-pwd">Forgot Password?</a>
 							<div class="submit-btns">
-								<button class="mtr-btn" type="submit"><span>Login</span></button>
-								<a href="{% url 'signup' %}"><button class="mtr-btn" type="button"><span>Register</span></button></a>
+								<button class="mtr-btn" type="submit"><span>Register</span></button>
 							</div>
 							{% if form.errors %}
 								{% for field in form %}

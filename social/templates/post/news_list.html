@@ -131,7 +131,7 @@
 											</div>
 											<div class="coment-area">
 												<ul class="we-comet">
-													{% for comment in get_comments_post %}
+													{% for comment in post.get_comments_post %}
 													<li>
 														<div class="comet-avatar">
 															<img src="{{ comment.author.avatar.url }}" alt="">

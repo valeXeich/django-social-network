@@ -4,165 +4,166 @@
 
 {% block content %}
 <section>
-		<div class="feature-photo">
-			{% include 'profile/profile_button_background.html' %}
-					<div class="col-lg-10 col-sm-9">
-						<div class="timeline-info">
-							<ul>
-								<li class="admin-name">
-								  <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
-								  <span>@{{ profile.slug }}</span>
-								</li>
-								<li>
-									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
-									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
-									<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
-									{% if request.user == profile.user %}
-									<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
-									{% endif %}
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
+	<div class="feature-photo">
+		{% include 'profile/profile_button_background.html' %}
+		<div class="col-lg-10 col-sm-9">
+			<div class="timeline-info">
+				<ul>
+					<li class="admin-name">
+						<h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
+						<span>@{{ profile.slug }}</span>
+					</li>
+					<li>
+						<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
+						<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
+						<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
+						{% if request.user == profile.user %}
+						<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
+						{% endif %}
+					</li>
+				</ul>
 			</div>
 		</div>
-	</section><!-- top area -->
+	</div>
+</section><!-- top area -->
 
-	<section>
-		<div class="gap gray-bg">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="row" id="page-contents">
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/information.html' %}
-									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-								</aside>
-							</div><!-- sidebar -->
+<section>
+	<div class="gap gray-bg">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="row" id="page-contents">
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/information.html' %}
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+							</aside>
+						</div><!-- sidebar -->
 
-							<div class="col-lg-6">
-								<div class="central-meta">
-									<div class="messages">
-										<h5 class="f-title"><i class="ti-bell"></i>All Messages <span class="more-options"><i class="fa fa-ellipsis-h"></i></span></h5>
-										<div class="message-box">
-											<ul class="peoples">
-												{% for dialog in dialogues %}
+						<div class="col-lg-6">
+							<div class="central-meta">
+								<div class="messages">
+									<h5 class="f-title"><i class="ti-bell"></i>All Messages <span class="more-options"><i class="fa fa-ellipsis-h"></i></span></h5>
+									<div class="message-box">
+										<ul class="peoples">
+											{% for dialog in dialogues %}
 												{% if dialog.owner == profile %}
-												<li>
-													<a href="{{ dialog.get_absolute_url }}">
-													<figure>
-														<img src="{{ dialog.companion.avatar.url }}" alt="">
-														{% if dialog.companion in online_users %}
-														<span class="status f-online"></span>
-														{% else %}
-															<span class="status f-offline"></span>
-														{% endif %}
-													</figure>
-													<div class="people-name">
-														<span>{{ dialog.companion.first_name }} {{ doialog.companion.last_name }}</span>
-													</div>
+													<li>
+														<a href="{{ dialog.get_absolute_url }}">
+															<figure>
+																<img src="{{ dialog.companion.avatar.url }}" alt="">
+																{% if dialog.companion in online_users %}
+																	<span class="status f-online"></span>
+																{% else %}
+																	<span class="status f-offline"></span>
+																{% endif %}
+															</figure>
+															<div class="people-name">
+																<span>{{ dialog.companion.first_name }} {{ dialog.companion.last_name }}</span>
+															</div>
 														</a>
-												</li>
+													</li>
 												{% elif dialog.companion == profile %}
-												<li>
-													<a href="{{ dialog.get_absolute_url }}">
-													<figure>
-														<img src="{{ dialog.owner.avatar.url }}" alt="">
-														<span class="status f-online"></span>
-													</figure>
-													<div class="people-name">
-														<span>{{ dialog.owner.first_name }} {{ doialog.owner.last_name }}</span>
-													</div>
+													<li>
+														<a href="{{ dialog.get_absolute_url }}">
+															<figure>
+																<img src="{{ dialog.owner.avatar.url }}" alt="">
+																{% if dialog.owner in online_users %}
+																<span class="status f-online"></span>
+																{% else %}
+																<span class="status f-offline"></span>
+																{% endif %}
+															</figure>
+															<div class="people-name">
+																<span>{{ dialog.owner.first_name }} {{ dialog.owner.last_name }}</span>
+															</div>
 														</a>
-												</li>
+													</li>
 												{% endif %}
-												{% endfor %}
-											</ul>
-											<div class="peoples-mesg-box">
-												<div class="conversation-head">
-													{% if dialog.owner == profile %}
+											{% endfor %}
+										</ul>
+										<div class="peoples-mesg-box">
+											<div class="conversation-head">
+												{% if dialog.owner == profile %}
 													<figure><img src="{{ dialog.companion.avatar.url }}" alt=""></figure>
 													<span>
 														{{ dialog.companion.first_name }} {{ dialog.companion.last_name }}
 														{% if dialog.companion in online_users %}
-														<i>online</i>
+															<i>online</i>
 														{% else %}
-														<i>offline</i>
+															<i>offline</i>
 														{% endif %}
 													</span>
-													{% else %}
-													<figure><img src="{{ dialog.owner.avatar.url }}" alt=""></figure>
-													<span>
+												{% else %}
+												<figure><img src="{{ dialog.owner.avatar.url }}" alt=""></figure>
+												<span>
 														{{ dialog.owner.first_name }} {{ dialog.owner.last_name }}
 														{% if dialog.owner in online_users %}
-														<i>online</i>
+															<i>online</i>
 														{% else %}
-														<i>offline</i>
+															<i>offline</i>
 														{% endif %}
 													</span>
-													{% endif %}
-												</div>
-												<ul class="chatting-area">
-													{% if dialog.get_messages_sender_list %}
+												{% endif %}
+											</div>
+											<ul class="chatting-area">
+												{% if dialog.get_messages_sender_list %}
 													{% for message in dialog.get_messages_sender_list %}
-													{% if dialog.owner == profile %}
-													{% if message.sender == dialog.companion %}
-													<li class="you">
-														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
-														<p>{{ message.text }}</p>
-													</li>
-													{% else %}
-													<li class="me">
-														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
-														<p>{{ message.text }}</p>
-													</li>
-													{% endif %}
-													{% elif dialog.companion == profile %}
-
-													{% if message.sender == dialog.owner %}
-													<li class="you">
-														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
-														<p>{{ message.text }}</p>
-													</li>
-													{% else %}
-													<li class="me">
-														<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
-														<p>{{ message.text }}</p>
-													</li>
-													{% endif %}
-													{% endif %}
+														{% if dialog.owner == profile %}
+															{% if message.sender == dialog.companion %}
+																<li class="you">
+																	<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+																	<p>{{ message.text }}</p>
+																</li>
+															{% else %}
+																<li class="me">
+																	<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+																	<p>{{ message.text }}</p>
+																</li>
+															{% endif %}
+														{% elif dialog.companion == profile %}
+															{% if message.sender == dialog.owner %}
+																<li class="you">
+																	<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+																	<p>{{ message.text }}</p>
+																</li>
+															{% else %}
+																<li class="me">
+																	<figure><img src="{{ message.sender.avatar.url }}" alt=""></figure>
+																	<p>{{ message.text }}</p>
+																</li>
+															{% endif %}
+														{% endif %}
 													{% endfor %}
-													{% else %}
+												{% else %}
 													<h4 class="text-center">No messages yet</h4>
-													{% endif %}
-												</ul>
-												<div class="message-text-container">
-													<form action="{% url 'chat:create-message' %}" method="post">
-														{% csrf_token %}
-														{{ form_send.text }}
-														<input type="hidden" name="dialog_id" value="{{ dialog.id }}">
-														<button type="submit" title="send"><i class="fa fa-paper-plane"></i></button>
-													</form>
-												</div>
+												{% endif %}
+											</ul>
+											<div class="message-text-container">
+												<form action="{% url 'chat:create-message' %}" method="post">
+													{% csrf_token %}
+													{{ form_send.text }}
+													<input type="hidden" name="dialog_id" value="{{ dialog.id }}">
+													<button type="submit" title="send"><i class="fa fa-paper-plane"></i></button>
+												</form>
 											</div>
 										</div>
 									</div>
 								</div>
-							</div><!-- centerl meta -->
+							</div>
+						</div><!-- centerl meta -->
 
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/friends_sidebar.html' %}
-								</aside>
-							</div><!-- sidebar -->
-						</div>
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/friends_sidebar.html' %}
+							</aside>
+						</div><!-- sidebar -->
 					</div>
 				</div>
 			</div>
 		</div>
-	</section>
+	</div>
+</section>
 
 {% if request.user == profile.user %}
 <!--modal change background-->
@@ -173,16 +174,16 @@
 				<h4 class="modal-title">Upload background</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
-			<div class="modal-body">
+				<div class="modal-body">
 					{% csrf_token %}
 					{{ form_ab.background }}
-				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-			</div>
-			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button class="btn btn-danger" data-dismiss="modal">Close</button>
-			</div>
-				</form>
+					<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
@@ -195,16 +196,16 @@
 				<h4 class="modal-title">Upload avatar</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
-			<div class="modal-body">
+				<div class="modal-body">
 					{% csrf_token %}
 					{{ form_ab.avatar }}
-				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-			</div>
-			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button class="btn btn-danger" data-dismiss="modal">Close</button>
-			</div>
-				</form>
+					<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

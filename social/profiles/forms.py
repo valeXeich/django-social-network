@@ -45,7 +45,7 @@ class NewSignupForm(SignupForm):
         password_widget = forms.PasswordInput(attrs={'class': 'signup_input_password'})
         self.fields['first_name'] = forms.CharField(label='First name', widget=first_name_widget)
         self.fields['last_name'] = forms.CharField(label='Last name', widget=last_name_widget)
-        self.fields['username'] = forms.CharField(label='Username', widget=username_widget)
+        self.fields['username'] = forms.CharField(label='Your id', widget=username_widget)
         self.fields['email'] = forms.EmailField(label='E-mail', widget=email_widget)
         self.fields['password1'] = forms.CharField(label='Password', widget=password_widget)
         self.fields['password2'] = forms.CharField(label='Password (again)', widget=password_widget)
@@ -59,3 +59,4 @@ class NewLoginForm(LoginForm):
         password_widget = forms.PasswordInput(attrs={'id': 'login_input_password'})
         self.fields['login'] = forms.EmailField(label='E-mail', widget=email_widget)
         self.fields['password'] = forms.CharField(label='Password', widget=password_widget)
+

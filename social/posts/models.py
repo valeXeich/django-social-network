@@ -27,7 +27,7 @@ class Post(models.Model):
 
     def get_comments_post(self):
         """"Getting comments on a post"""
-        return self.comments.select_related('author', 'group', 'post').all()
+        return self.comments.all()
 
     def __str__(self):
         return f'Post author: {self.author}'
