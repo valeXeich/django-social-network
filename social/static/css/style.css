@@ -10059,7 +10059,12 @@ aside.sidebar.full-style {
 }
 
 .delete-com-g {
-    margin-left: 450px;
+    margin-left: 490px;
+    color: red;
+}
+
+.delete-com-f {
+    margin-left: 460px;
     color: red;
 }
 

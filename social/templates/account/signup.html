@@ -1,4 +1,6 @@
-{% extends '../../base.html' %}
+{% extends 'base.html' %}
+
+{% block title %}Registration{% endblock title %}
 
 {% load i18n %}
 
@@ -21,8 +23,8 @@
 				<div class="login-reg-bg">
 					<div class="log-reg-area">
 						<h2 class="log-title">Register</h2>
-						<a style="color:#088dcd" href="{% url 'login' %}">Have account?</a>
-						<form method="post" action="{% url 'signup' %}">
+						<a style="color:#088dcd" href="{{ login_url }}">Have account?</a>
+						<form method="post" action="{% url 'account_signup' %}">
 							{% csrf_token %}
 							<div class="form-group">	
 							  {{ form.first_name }}
@@ -52,7 +54,7 @@
       						<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
       						{% endif %}
 							<div class="submit-btns">
-								<button class="mtr-btn" type="submit"><span>Register</span></button>
+								<button class="mtr-btn" type="submit"><span>Registration</span></button>
 							</div>
 							{% if form.errors %}
 								{% for field in form %}

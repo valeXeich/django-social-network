@@ -6,13 +6,15 @@ from django.views import View
 from django.views.generic import DetailView, UpdateView, ListView, FormView, DeleteView
 
 from posts.forms import PostForm, CommentForm
+from profiles.forms import AvatarBackgroundUpdateForm
 from profiles.models import Profile
-from profiles.utils import get_online_users
+
+from .mixins import CustomContextMixin
 from .models import Group, GroupBan
 from .forms import AvatarBackgroundGroupUpdateForm, GroupInfoUpdateForm, GroupCreateForm
 
 
-class GroupDetailView(DetailView):
+class GroupDetailView(CustomContextMixin, DetailView):
     """"Group main page"""
     model = Group
     template_name = 'group/group_detail.html'
@@ -20,16 +22,9 @@ class GroupDetailView(DetailView):
     context_object_name = 'group'
 
     def get_context_data(self, **kwargs):
-        group = self.get_object()
-        group_ban_review = GroupBan.objects.get(group=group, ban_type='comment_ban')
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['profile'] = self.request.user.profile
         context['form_post'] = PostForm
         context['form_comment'] = CommentForm
-        context['form_group'] = AvatarBackgroundGroupUpdateForm
-        context['followers_muted'] = group_ban_review.follower.all()
-        context['online_users'] = get_online_users()
         return context
 
 
@@ -49,7 +44,7 @@ class AvatarBackgroundGroupUpdateView(LoginRequiredMixin, UserPassesTestMixin, U
         return reverse_lazy('groups:group-detail', kwargs={'slug': group_slug})
 
 
-class GroupInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+class GroupInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, CustomContextMixin, UpdateView):
     """"Updating group information"""
     form_class = GroupInfoUpdateForm
     model = Group
@@ -65,32 +60,20 @@ class GroupInfoUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         group_slug = self.request.POST.get('group_slug')
         return reverse_lazy('groups:group-update', kwargs={'slug': group_slug})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['profile'] = self.request.user.profile
-        context['form_group'] = AvatarBackgroundGroupUpdateForm
-        context['online_users'] = get_online_users()
-        return context
 
-
-class GroupFollowersView(DetailView):
+class GroupFollowersView(CustomContextMixin, DetailView):
     """"List group's followers"""
     model = Group
     template_name = 'group/group_followers.html'
 
     def get_context_data(self, **kwargs):
         group = self.get_object()
-        group_ban_review = GroupBan.objects.get(group=group, ban_type='comment_ban')
         context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['profile'] = self.request.user.profile
-        context['followers_muted'] = group_ban_review.follower.all()
-        context['online_users'] = get_online_users()
+        context['followers'] = group.followers.all()
         return context
 
 
-class GroupBanList(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class GroupBanList(LoginRequiredMixin, UserPassesTestMixin, CustomContextMixin, DetailView):
     """"List of banned users"""
     model = Group
     template_name = 'group/group_ban_list.html'
@@ -98,28 +81,14 @@ class GroupBanList(LoginRequiredMixin, UserPassesTestMixin, DetailView):
     def test_func(self):
         """"Admin and staff access"""
         group = self.get_object()
-        profile = self.request.user.profile
-        return profile in group.get_admin_and_staff()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['profile'] = self.request.user.profile
-        context['online_users'] = get_online_users()
-        return context
+        user = self.request.user
+        return user in group.get_admin_and_staff()
 
 
-class GroupAboutView(DetailView):
+class GroupAboutView(CustomContextMixin, DetailView):
     """"Group Information"""
     model = Group
     template_name = 'group/group_about.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if self.request.user.is_authenticated:
-            context['profile'] = self.request.user.profile
-        context['online_users'] = get_online_users()
-        return context
 
 
 class GroupFollowView(LoginRequiredMixin, View):
@@ -194,7 +163,7 @@ class GroupUnBan(LoginRequiredMixin, UserPassesTestMixin, View):
         return redirect('groups:group-followers', slug=group.slug)
 
 
-class CreateGroup(LoginRequiredMixin, FormView):
+class CreateGroup(LoginRequiredMixin, CustomContextMixin, FormView):
     """Creating group"""
     form_class = GroupCreateForm
     template_name = 'group/create_group.html'
@@ -215,11 +184,11 @@ class CreateGroup(LoginRequiredMixin, FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['profile'] = self.request.user.profile
+        context['form_ab'] = AvatarBackgroundUpdateForm
         return context
 
 
-class SearchGroupView(ListView):
+class SearchGroupView(CustomContextMixin, ListView):
     """"Group search"""
     model = Group
     template_name = 'search_group.html'
@@ -229,12 +198,6 @@ class SearchGroupView(ListView):
         data_input = self.request.GET.get('search_group')
         queryset = Group.objects.filter(name__icontains=data_input)
         return queryset
-
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['profile'] = self.request.user.profile
-        context['online_users'] = get_online_users()
-        return context
 
 
 class DeleteGroup(LoginRequiredMixin, UserPassesTestMixin, DeleteView):

@@ -1,88 +1,86 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Create group{% endblock title %}
 
 {% block content %}
 <section>
-		<div class="feature-photo">
-					{% include 'profile/profile_button_background.html' %}
-					<div class="col-lg-10 col-sm-9">
-						<div class="timeline-info">
-							<ul>
-								<li class="admin-name">
-								  <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
-								  <span>@{{ profile.slug }}</span>
-								</li>
-								<li>
-									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
-									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
-									<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
-									<a class="active" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
+	<div class="feature-photo">
+		{% include 'profile/profile_button_background.html' %}
+		<div class="col-lg-10 col-sm-9">
+			<div class="timeline-info">
+				<ul>
+					<li class="admin-name">
+						<h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
+						<span>@{{ profile.slug }}</span>
+					</li>
+					<li>
+						<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
+						<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
+						<a class="" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
+						<a class="active" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
+					</li>
+				</ul>
 			</div>
 		</div>
-	</section><!-- top area -->
+	</div>
+</section><!-- top area -->
 
-	<section>
-		<div class="gap gray-bg">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="row" id="page-contents">
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/information.html' %}
-									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-								</aside>
-							</div><!-- sidebar -->
+<section>
+	<div class="gap gray-bg">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="row" id="page-contents">
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/information.html' %}
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+							</aside>
+						</div><!-- sidebar -->
 
-							<div class="col-lg-6">
-								<div class="central-meta">
-									<div class="editing-info">
-										<h5 class="f-title"><i class="ti-info-alt"></i> Create Group</h5>
+						<div class="col-lg-6">
+							<div class="central-meta">
+								<div class="editing-info">
+									<h5 class="f-title"><i class="ti-info-alt"></i> Create Group</h5>
 
-										<form action="{% url 'groups:create-group' %}" method="post">
-											{% csrf_token %}
-											<div class="form-group half">
-											  {{ form.name }}
-											  <label class="control-label" for="input">Group name</label><i class="mtrl-select"></i>
-											</div>
-											<div class="form-group">
-											  {{ form.about }}
-												<label class="control-label" for="input">About</label><i class="mtrl-select"></i>
-											</div>
-											<div class="form-group">
-												<p class="info-title">Upload avatar</p>
-											  {{ form.avatar }}
-											</div>
-											<div class="form-group">
-												<p class="info-title">Upload background</p>
-												{{ form.background }}
-											</div>
-											<div class="submit-btns">
-												<button type="submit" class="mtr-btn"><span>Create</span></button>
-												<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-											</div>
-										</form>
-									</div>
+									<form action="{% url 'groups:create-group' %}" method="post">
+										{% csrf_token %}
+										<div class="form-group half">
+											{{ form.name }}
+											<label class="control-label" for="input">Group name</label><i class="mtrl-select"></i>
+										</div>
+										<div class="form-group">
+											{{ form.about }}
+											<label class="control-label" for="input">About</label><i class="mtrl-select"></i>
+										</div>
+										<div class="form-group">
+											<p class="info-title">Upload avatar</p>
+											{{ form.avatar }}
+										</div>
+										<div class="form-group">
+											<p class="info-title">Upload background</p>
+											{{ form.background }}
+										</div>
+										<div class="submit-btns">
+											<button type="submit" class="mtr-btn"><span>Create</span></button>
+											<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+										</div>
+									</form>
 								</div>
-							</div><!-- centerl meta -->
+							</div>
+						</div><!-- centerl meta -->
 
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/friends_sidebar.html' %}
-								</aside>
-							</div><!-- sidebar -->
-						</div>
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/friends_sidebar.html' %}
+							</aside>
+						</div><!-- sidebar -->
 					</div>
 				</div>
 			</div>
 		</div>
-	</section>
+	</div>
+</section>
 
 {% if request.user == profile.user %}
 <!--modal change background-->
@@ -93,16 +91,16 @@
 				<h4 class="modal-title">Upload background</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
-			<div class="modal-body">
+				<div class="modal-body">
 					{% csrf_token %}
 					{{ form_ab.background }}
-				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-			</div>
-			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button class="btn btn-danger" data-dismiss="modal">Close</button>
-			</div>
-				</form>
+					<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
@@ -115,16 +113,16 @@
 				<h4 class="modal-title">Upload avatar</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
-			<div class="modal-body">
+				<div class="modal-body">
 					{% csrf_token %}
 					{{ form_ab.avatar }}
-				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-			</div>
-			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button class="btn btn-danger" data-dismiss="modal">Close</button>
-			</div>
-				</form>
+					<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

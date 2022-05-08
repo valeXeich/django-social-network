@@ -1,198 +1,193 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Feed{% endblock title %}
 
 {% block content %}
 
 <section>
-		<div class="gap gray-bg">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="row" id="page-contents">
+	<div class="gap gray-bg">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="row" id="page-contents">
 
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'shortcuts.html' %}
-								</aside>
-							</div><!-- sidebar -->
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'shortcuts.html' %}
+							</aside>
+						</div><!-- sidebar -->
 
-							<div class="col-lg-6">
-								<div class="central-meta item">
-										<div class="new-postbox">
-											<figure>
-												<img src="{{ profile.avatar.url }}" alt="">
-											</figure>
-											<div class="newpst-input">
-												<form action="{% url 'posts:form-create' %}" method="post" enctype="multipart/form-data">
-													{% csrf_token %}
-													{{ form_post.text }}
-													<div class="attachments">
-														<ul>
-															<li>
-																<i class="fa fa-image"></i>
-																<label class="fileContainer">
-																	{{ form_post.image }}
-																</label>
-															</li>
-															<li>
-																<i class="fa fa-video-camera"></i>
-																<label class="fileContainer">
-																	{{ form_post.video }}
-																</label>
-															</li>
-															<li>
-																<input type="hidden" name="feed" value="feed">
-																<button type="submit">Publish</button>
-															</li>
-														</ul>
-													</div>
-												</form>
+						<div class="col-lg-6">
+							<div class="central-meta item">
+								<div class="new-postbox">
+									<figure>
+										<img src="{{ profile.avatar.url }}" alt="">
+									</figure>
+									<div class="newpst-input">
+										<form action="{% url 'posts:form-create' %}" method="post" enctype="multipart/form-data">
+											{% csrf_token %}
+											{{ form_post.text }}
+											<div class="attachments">
+												<ul>
+													<li>
+														<i class="fa fa-image"></i>
+														<label class="fileContainer">
+															{{ form_post.image }}
+														</label>
+													</li>
+													<li>
+														<i class="fa fa-video-camera"></i>
+														<label class="fileContainer">
+															{{ form_post.video }}
+														</label>
+													</li>
+													<li>
+														<input type="hidden" name="feed" value="feed">
+														<button type="submit">Publish</button>
+													</li>
+												</ul>
 											</div>
-										</div>
-									</div><!-- add post new box -->
-								<div class="loadMore">
+										</form>
+									</div>
+								</div>
+							</div><!-- add post new box -->
+							<div class="loadMore">
 
 								{% for post in posts %}
 								<div class="central-meta item">
-										<div class="user-post">
-											<div class="friend-info">
+									<div class="user-post">
+										<div class="friend-info">
+											{% if post.group is None %}
+											<figure>
+												<img src="{{ post.author.avatar.url }}" alt="">
+											</figure>
+											{% else %}
+											<figure>
+												<img src="{{ post.group.avatar.url }}" alt="">
+											</figure>
+											{% endif %}
+											<div class="friend-name ">
 												{% if post.group is None %}
-												<figure>
-													<img src="{{ post.author.avatar.url }}" alt="">
-												</figure>
+												<ins>
+													<a href="{{ post.author.get_absolute_url }}" title="">{{ post.author.first_name }} {{ post.author.last_name }}</a>
+												</ins>
 												{% else %}
-												<figure>
-													<img src="{{ post.group.avatar.url }}" alt="">
-												</figure>
+												<ins>
+													<a href="{{ post.group.get_absolute_url }}" title="">{{ post.group.name }}</a>
+												</ins>
 												{% endif %}
-												<div class="friend-name ">
-													{% if post.group is None %}
-													<ins>
-														<a href="{{ post.author.get_absolute_url }}" title="">{{ post.author.first_name }} {{ post.author.last_name }}</a>
-													</ins>
-													{% else %}
-													<ins>
-														<a href="{{ post.group.get_absolute_url }}" title="">{{ post.group.name }}</a>
-													</ins>
-													{% endif %}
-													<span>{{ post.created_date }}</span>
-													{% if request.user.profile == post.author and post.group == None %}
-													<form action="{% url 'posts:post-delete' pk=post.pk %}" method="post" class="delete-btn">
-														{% csrf_token %}
-														<button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
-														<input type="hidden" name="feed" value="feed">
-													</form>
-													{% endif %}
-												</div>
-												<div class="post-meta">
-													{% if post.image %}
-													<img src="{{ post.image.url }}" alt="">
-													{% endif %}
-													<div class="we-video-info">
-														<ul>
-															<li>
-																<form action="{% url 'posts:post-like' %}" method="post">
-																	{% csrf_token %}
+												<span>{{ post.created_date }}</span>
+												{% if request.user.profile == post.author and post.group == None %}
+												<form action="{% url 'posts:post-delete' pk=post.pk %}" method="post" class="delete-btn">
+													{% csrf_token %}
+													<button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+													<input type="hidden" name="feed" value="feed">
+												</form>
+												{% endif %}
+											</div>
+											<div class="post-meta">
+												{% if post.image %}
+												<img src="{{ post.image.url }}" alt="">
+												{% endif %}
+												<div class="we-video-info">
+													<ul>
+														<li>
+															<form action="{% url 'posts:post-like' %}" method="post">
+																{% csrf_token %}
 																<span class="like" data-toggle="tooltip" title="like">
 																		<i class="ti-heart icon-custom"><button type="submit" class="btn-custom"></button></i>
 																	<input type="hidden" name="post_id" value="{{ post.id }}">
 																	<input type="hidden" name="feed" value="feed">
 																	<ins>{{ post.liked.count }}</ins>
 																</span>
-																	</form>
-															</li>
-															<li>
-																<form action="{% url 'posts:post-dislike' %}" method="post">
-																	{% csrf_token %}
+															</form>
+														</li>
+														<li>
+															<form action="{% url 'posts:post-dislike' %}" method="post">
+																{% csrf_token %}
 																<span class="dislike" data-toggle="tooltip" title="dislike">
 																	<i class="ti-heart-broken icon-custom"><button type="submit" class="btn-custom"></button></i>
 																	<input type="hidden" name="post_id" value="{{ post.id }}">
 																	<input type="hidden" name="feed" value="feed">
 																	<ins>{{ post.disliked.count }}</ins>
 																</span>
-																</form>
-															</li>
-															<li>
-																<span class="comment" data-toggle="tooltip" title="Comments">
-																	<i class="fa fa-comments-o"></i>
-																	<ins>{{ post.comments.count }}</ins>
-																</span>
-															</li>
-														</ul>
-													</div>
-													<div class="description">
-
-														<p>
-															{{ post.text }}
-														</p>
-													</div>
+															</form>
+														</li>
+														<li>
+															<span class="comment" data-toggle="tooltip" title="Comments">
+																<i class="fa fa-comments-o"></i>
+																<ins>{{ post.comments.count }}</ins>
+															</span>
+														</li>
+													</ul>
+												</div>
+												<div class="description">
+													<p>
+														{{ post.text }}
+													</p>
 												</div>
 											</div>
-											<div class="coment-area">
-												<ul class="we-comet">
-													{% for comment in post.get_comments_post %}
-													<li>
-														<div class="comet-avatar">
-															<img src="{{ comment.author.avatar.url }}" alt="">
-														</div>
-														<div class="we-comment">
-															<div class="coment-head">
-																<h5><a href="{{ comment.author.get_absolute_url }}" title="">{{ comment.author.first_name }} {{ comment.author.last_name }}</a></h5>
-																<span>{{ comment.created_date }}</span>
-																<a class="we-reply" href="#" title="Reply"><i class="fa fa-reply"></i></a>
-																{% if request.user.profile == comment.author %}
-																	<i class="bi bi-x-circle delete-com-g icon-custom">
-																		<form action="{% url 'posts:comment-delete' %}" method="post">
-																			{% csrf_token %}
-																			<button type="submit" class="btn-custom"></button>
-																			<input type="hidden" name="comment_id" value="{{ comment.id }}">
-																			<input type="hidden" name="feed" value="feed">
-																		</form>
-																	</i>
-																{% endif %}
-															</div>
-															<p>{{ comment.text }}</p>
-														</div>
-													</li>
-													{% endfor %}
-													<li>
-														<a href="#" title="" class="showmore underline">more comments</a>
-													</li>
-													<li class="post-comment">
-														<div class="comet-avatar">
-															<img src="{{ profile.avatar.url }}" alt="">
-														</div>
-														<div class="post-comt-box">
-															{% if request.user.is_authenticated %}
-															<form action="{% url 'posts:comment-create' %}" method="post">
-																{% csrf_token %}
-																{{ form_comment.text }}
-																<input type="hidden" name="post_id" value="{{ post.id }}">
-																<input type="hidden" name="feed" value="feed">
-																<button type="submit">Review</button>
-															</form>
+										</div>
+										<div class="coment-area">
+											<ul class="we-comet">
+												{% for comment in post.comments.all %}
+												<li>
+													<div class="comet-avatar">
+														<img src="{{ comment.author.avatar.url }}" alt="">
+													</div>
+													<div class="we-comment">
+														<div class="coment-head">
+															<h5><a href="{{ comment.author.get_absolute_url }}" title="">{{ comment.author.first_name }} {{ comment.author.last_name }}</a></h5>
+															<span>{{ comment.created_date }}</span>
+															<a class="we-reply" href="#" title="Reply"><i class="fa fa-reply"></i></a>
+															{% if request.user.profile == comment.author %}
+															<i class="bi bi-x-circle delete-com-f icon-custom">
+																<form action="{% url 'posts:comment-delete' %}" method="post">
+																	{% csrf_token %}
+																	<button type="submit" class="btn-custom"></button>
+																	<input type="hidden" name="comment_id" value="{{ comment.id }}">
+																	<input type="hidden" name="feed" value="feed">
+																</form>
+															</i>
 															{% endif %}
 														</div>
-													</li>
-												</ul>
-											</div>
+														<p>{{ comment.text }}</p>
+													</div>
+												</li>
+												{% endfor %}
+												<li class="post-comment">
+													<div class="comet-avatar">
+														<img src="{{ profile.avatar.url }}" alt="">
+													</div>
+													<div class="post-comt-box">
+														{% if request.user.is_authenticated %}
+														<form action="{% url 'posts:comment-create' %}" method="post">
+															{% csrf_token %}
+															{{ form_comment.text }}
+															<input type="hidden" name="post_id" value="{{ post.id }}">
+															<input type="hidden" name="feed" value="feed">
+															<button type="submit">Review</button>
+														</form>
+														{% endif %}
+													</div>
+												</li>
+											</ul>
 										</div>
 									</div>
-									{% endfor %}
 								</div>
-							</div><!-- centerl meta -->
-
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/friends_sidebar.html' %}
-								</aside>
-							</div><!-- sidebar -->
-						</div>
+								{% endfor %}
+							</div>
+						</div><!-- centerl meta -->
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/friends_sidebar.html' %}
+							</aside>
+						</div><!-- sidebar -->
 					</div>
 				</div>
 			</div>
 		</div>
-	</section>
+	</div>
+</section>
 
 {% endblock content %}

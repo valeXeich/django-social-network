@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views import View
@@ -6,13 +7,13 @@ from django.views.generic import ListView, DetailView, FormView
 from django.db.models import Q
 
 from profiles.models import Profile
-from profiles.utils import get_online_users
 
 from .forms import SendMessageForm
-from .models import Dialog
+from .mixins import CustomContextMixin
+from .models import Dialog, Message
 
 
-class DialogListView(LoginRequiredMixin, ListView):
+class DialogListView(LoginRequiredMixin, CustomContextMixin, ListView):
     """"User Dialogs"""
     model = Dialog
     template_name = 'profile/profile_messages.html'
@@ -21,17 +22,11 @@ class DialogListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         queryset = Dialog.objects.filter(
             Q(owner=self.request.user.profile) | Q(companion=self.request.user.profile)
-        )
+        ).select_related('owner', 'companion')
         return queryset
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        context['profile'] = self.request.user.profile
-        context['online_users'] = get_online_users()
-        return context
 
-
-class DialogDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
+class DialogDetailView(LoginRequiredMixin, UserPassesTestMixin, CustomContextMixin, DetailView):
     """"Dialogue room"""
     model = Dialog
     template_name = 'profile/dialog_detail.html'
@@ -43,16 +38,26 @@ class DialogDetailView(LoginRequiredMixin, UserPassesTestMixin, DetailView):
         return profile == dialog.owner or profile == dialog.companion
 
     def get_context_data(self, *args, **kwargs):
-        profile = self.request.user.profile
         dialogues = Dialog.objects.filter(
             Q(owner=self.request.user.profile) | Q(companion=self.request.user.profile)
-        )
+        ).select_related('owner', 'companion')
         context = super().get_context_data(*args, **kwargs)
-        context['profile'] = profile
         context['form_send'] = SendMessageForm
         context['dialogues'] = dialogues
-        context['online_users'] = get_online_users()
         return context
+
+
+class MessageJson(View):
+    """"Message json response for chat"""
+    def get(self, request, pk, *args, **kwargs):
+        dialog = Dialog.objects.get(pk=pk)
+        context = {
+            'messages': dialog.get_messages_sender(),
+            'profile_id': request.user.profile.id,
+            'dialog_companion_id': dialog.companion.id,
+            'dialog_owner_id': dialog.owner.id
+        }
+        return JsonResponse(context)
 
 
 class CreateOrGetDialog(LoginRequiredMixin, View):
@@ -72,20 +77,26 @@ class CreateOrGetDialog(LoginRequiredMixin, View):
 class CreateMessageView(LoginRequiredMixin, FormView):
     """"Sending a message to an interlocutor"""
     form_class = SendMessageForm
+    template_name = 'profile/dialog_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = self.request.user.profile
+        return context
 
     def get_success_url(self, **kwargs):
         dialog_id = self.request.POST.get('dialog_id')
         return reverse_lazy('profiles:profile-dialog-detail', kwargs={'pk': dialog_id})
 
     def post(self, request, *args, **kwargs):
-        form = self.get_form()
+        form = SendMessageForm(request.POST)
         if form.is_valid():
-            return self.form_valid(form)
+            dialog_id = request.POST.get('dialog_id')
+            dialog = Dialog.objects.get(id=dialog_id)
+            text = request.POST.get('text')
+            Message.objects.create(dialog=dialog, sender=request.user.profile, text=text)
+            return HttpResponse('Success')
         else:
             return self.form_invalid(form)
 
-    def form_valid(self, form):
-        dialog_id = self.request.POST.get('dialog_id')
-        dialog = Dialog.objects.get(id=dialog_id)
-        self.object = form.save(dialog=dialog, sender=self.request.user.profile)
-        return super().form_valid(form)
+

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Ban list{% endblock title %}
 
 {% block content %}
 <section>
@@ -26,8 +26,6 @@
 			</div>
 		</div>
 	</div>
-	</div>
-	</div>
 </section><!-- top area -->
 
 <section>
@@ -48,7 +46,6 @@
 									<span><i class="fa fa-users"></i> Ban List</span>
 								</div>
 								<ul class="nearby-contct">
-									{% if group.get_followers_ban %}
 									{% for profile_ban in group.get_followers_ban %}
 									<li>
 										<div class="nearly-pepls">
@@ -68,10 +65,9 @@
 											</div>
 										</div>
 									</li>
-									{% endfor %}
-									{% else %}
+									{% empty %}
 									<h1 class="text-center">Ban list is empty</h1>
-									{% endif %}
+									{% endfor %}
 								</ul>
 							</div><!-- photos -->
 						</div><!-- centerl meta -->

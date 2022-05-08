@@ -1,0 +1,3 @@
+token = '82d36c66932846add2d373ca99e3d582'
+key = '050bd51c74bec8b859ec87accc0185dc00ba4457'
+secret = 'hiF7ZpKNm42rMGjVyfTunr9JOU9L/Y+DVJ3YcBhsM5kAUGAad/UWxlN5+c19D3b8ZFurlMW0ilaFuOFLZJWVct4mK/IWAv0CcxYwTgQXeLi84xynplwnK0vTZ2DFTJtt'

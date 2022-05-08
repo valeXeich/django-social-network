@@ -1,52 +1,52 @@
 <figure><img src="{{ group.background.url }}" alt=""></figure>
-		{% if request.user.profile not in group.followers.all and request.user.profile not in group.get_followers_ban %}
-		<form action="{% url 'groups:group-follow' %}" method="post">
-			{% csrf_token %}
-			<div class="add-btn">
-				<span>{{ group.followers.count }} followers</span>
-				<button type="submit">Follow</button>
-				<input type="hidden" name="group_id" value="{{ group.id }}">
-				<input type="hidden" name="follow" value="follow">
-			</div>
-		</form>
-		{% elif request.user.profile in group.followers.all %}
-		<form action="{% url 'groups:group-follow' %}" method="post">
-			{% csrf_token %}
-			<div class="add-btn">
-				<span>{{ group.followers.count }} followers</span>
-				<button type="submit">Unfollow</button>
-				<input type="hidden" name="group_id" value="{{ group.id }}">
-				<input type="hidden" name="unfollow" value="unfollow">
-			</div>
-		</form>
-		{% elif request.user.profile in group.get_followers_ban %}
-		<div class="add-btn">
-			<span>{{ group.followers.count }} followers</span>
-			<button disabled>Follow</button>
-		</div>
-		{% endif %}
-		{% if request.user.profile == group.admin_group %}
-		<div class="edit-phto">
-			<i class="fa fa-camera-retro"></i>
-			<label class="fileContainer" data-toggle="modal" data-target="#changeBackground">
-				Edit Cover Photo
-			</label>
-		</div>
-		{% endif %}
-		<div class="container-fluid">
-			<div class="row merged" >
-				<div class="col-lg-2 col-sm-3">
-					<div class="user-avatar">
-						<figure>
-							<img src="{{ group.avatar.url }}" alt="">
-							{% if request.user.profile == group.admin_group %}
-							<div class="edit-phto">
-								<i class="fa fa-camera-retro"></i>
-								<label class="fileContainer" data-toggle="modal" data-target="#changeAvatar">
-									Edit Display Photo
-								</label>
-							</div>
-							{% endif %}
-						</figure>
+{% if request.user.profile not in group.followers.all and request.user.profile not in group.get_followers_ban %}
+<form action="{% url 'groups:group-follow' %}" method="post">
+	{% csrf_token %}
+	<div class="add-btn">
+		<span>{{ group.followers.count }} followers</span>
+		<button type="submit">Follow</button>
+		<input type="hidden" name="group_id" value="{{ group.id }}">
+		<input type="hidden" name="follow" value="follow">
+	</div>
+</form>
+{% elif request.user.profile in group.followers.all %}
+<form action="{% url 'groups:group-follow' %}" method="post">
+	{% csrf_token %}
+	<div class="add-btn">
+		<span>{{ group.followers.count }} followers</span>
+		<button type="submit">Unfollow</button>
+		<input type="hidden" name="group_id" value="{{ group.id }}">
+		<input type="hidden" name="unfollow" value="unfollow">
+	</div>
+</form>
+{% elif request.user.profile in group.get_followers_ban %}
+<div class="add-btn">
+	<span>{{ group.followers.count }} followers</span>
+	<button disabled>Follow</button>
+</div>
+{% endif %}
+{% if request.user.profile == group.admin_group %}
+<div class="edit-phto">
+	<i class="fa fa-camera-retro"></i>
+	<label class="fileContainer" data-toggle="modal" data-target="#changeBackground">
+		Edit Cover Photo
+	</label>
+</div>
+{% endif %}
+<div class="container-fluid">
+	<div class="row merged" >
+		<div class="col-lg-2 col-sm-3">
+			<div class="user-avatar">
+				<figure>
+					<img src="{{ group.avatar.url }}" alt="">
+					{% if request.user.profile == group.admin_group %}
+					<div class="edit-phto">
+						<i class="fa fa-camera-retro"></i>
+						<label class="fileContainer" data-toggle="modal" data-target="#changeAvatar">
+							Edit Display Photo
+						</label>
 					</div>
-				</div>
+					{% endif %}
+				</figure>
+			</div>
+		</div>

@@ -4,10 +4,26 @@
         <ul class="basics">
             <li>First name: {{ profile.first_name }}</li>
             <li>Last name: {{ profile.last_name }}</li>
+            {% if profile.get_country_display %}
             <li>Country: <img src="{{ profile.country.flag }}"> {{ profile.get_country_display }}</li>
+            {% else %}
+            <li>Country: Not specified</li>
+            {% endif %}
+            {% if profile.get_gender_display %}
             <li>Gender: {{ profile.get_gender_display }}</li>
+            {% else %}
+            <li>Gender: Not specified</li>
+            {% endif %}
+            {% if profile.date_birth %}
             <li>Date of birth: {{ profile.date_birth }}</li>
+            {% else %}
+            <li>Date of birth: Not specified</li>
+            {% endif %}
+            {% if profile.about %}
             <li>About me: <p>{{ profile.about }}</p></li>
+            {% else %}
+            <li>About me: <p>Not specified</p></li>
+            {% endif %}
         </ul>
     </div>
 </div>

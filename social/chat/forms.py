@@ -8,8 +8,8 @@ class SendMessageForm(forms.ModelForm):
         model = Message
         fields = ['text']
 
-    def save(self, dialog, sender):
-        obj = super().save(commit=False)
-        obj.dialog = dialog
-        obj.sender = sender
-        return obj.save()
+        widgets = {
+            'text': forms.Textarea(attrs={'id': 'send'})
+        }
+
+

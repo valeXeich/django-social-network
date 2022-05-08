@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Followers{% endblock title %}
 
 {% block content %}
 <section>
@@ -30,8 +30,6 @@
 			</div>
 		</div>
 	</div>
-	</div>
-	</div>
 </section><!-- top area -->
 
 <section>
@@ -43,8 +41,8 @@
 						<div class="col-lg-3">
 							<aside class="sidebar static">
 								{% if not request.user.is_anonymous %}
-									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-									{% endif %}
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+								{% endif %}
 							</aside>
 						</div><!-- sidebar -->
 						{% if request.user.profile not in group.get_followers_ban %}
@@ -55,7 +53,7 @@
 								</div>
 								<ul class="nearby-contct">
 									{% if group.followers.all %}
-									{% for follower in group.followers.all %}
+									{% for follower in followers %}
 									<li>
 										<div class="nearly-pepls">
 											<figure>
@@ -64,7 +62,7 @@
 											<div class="pepl-info">
 												<h4><a href="{{ follower.get_absolute_url }}" title="">{{ follower.first_name }} {{ follower.last_name }}</a></h4>
 												<a href="{{ follower.get_absolute_url }}"><br><span class="info-title">@{{ follower.slug }}</span></a>
-												{% if request.user in group.get_admin_and_staff %}
+												{% if request.user.profile == group.admin_group or request.user.profile in group.staff.all %}
 												{% if follower not in followers_muted  %}
 												<form action="{% url 'groups:group-ban' %}" method="post">
 													{% csrf_token %}

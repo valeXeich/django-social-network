@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -11,6 +12,7 @@ from profiles.utils import get_online_users
 from .forms import PostForm, CommentForm
 from .models import Post, Comment
 from .utils import get_posts_for_user
+from .tasks import upload_to_vimeo, delete_video_from_vimeo
 
 
 class PostFormView(LoginRequiredMixin, FormView):
@@ -43,6 +45,10 @@ class PostFormView(LoginRequiredMixin, FormView):
             group = Group.objects.get(id=group_id)
             self.object.group = group
         self.object.save()
+        if form.cleaned_data['video']:
+            post = Post.objects.get(id=self.object.id)
+            upload_to_vimeo.delay(f'media/{post.video}', user.profile.slug, post.text, post.id)
+            messages.success(self.request, 'Your video is uploading, please wait a few minutes.')
         return super().form_valid(form)
 
 
@@ -136,6 +142,13 @@ class DislikeUpdate(LoginRequiredMixin, View):
 class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     """"Delete post"""
     model = Post
+
+    def post(self, request, *args, **kwargs):
+        if self.get_object().vimeo_url:
+            vimeo_url = self.get_object().vimeo_url
+            vimeo_id = vimeo_url.split('/')[-1]
+            delete_video_from_vimeo.delay(vimeo_id)
+        return super().post(request, *args, **kwargs)
 
     def test_func(self):
         """"

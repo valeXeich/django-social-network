@@ -1,34 +1,32 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Group{% endblock title %}
 
 {% block content %}
 <section>
 	<div class="feature-photo">
 		{% include 'group/group_button_background.html' %}
-				<div class="col-lg-10 col-sm-9">
-					<div class="timeline-info">
-						<ul>
-							<li class="admin-name">
-								<h5>{{ group.name }}</h5>
-								<span>@{{ group.slug }}</span>
-							</li>
-							{% if request.user.profile not in group.get_followers_ban %}
-							<li>
-								<a class="active" href="{{ group.get_absolute_url }}" title="" data-ripple="">Wall</a>
-								<a class="" href="{% url 'groups:group-followers' slug=group.slug %}" title="" data-ripple="">Followers</a>
-								<a class="" href="{% url 'groups:group-about' slug=group.slug %}" title="" data-ripple="">About</a>
-								{% if request.user in group.get_admin_and_staff %}
-								<a class="" href="{% url 'groups:group-ban-list' slug=group.slug %}" title="" data-ripple="">Ban list</a>
-								{% endif %}
-								{% if request.user.profile == group.admin_group %}
-								<a class="" href="{% url 'groups:group-update' slug=group.slug %}" title="" data-ripple="">Settings</a>
-								{% endif %}
-							</li>
-							{% endif %}
-						</ul>
-					</div>
-				</div>
+		<div class="col-lg-10 col-sm-9">
+			<div class="timeline-info">
+				<ul>
+					<li class="admin-name">
+						<h5>{{ group.name }}</h5>
+						<span>@{{ group.slug }}</span>
+					</li>
+					{% if request.user.profile not in group.get_followers_ban %}
+					<li>
+						<a class="active" href="{{ group.get_absolute_url }}" title="" data-ripple="">Wall</a>
+						<a class="" href="{% url 'groups:group-followers' slug=group.slug %}" title="" data-ripple="">Followers</a>
+						<a class="" href="{% url 'groups:group-about' slug=group.slug %}" title="" data-ripple="">About</a>
+						{% if request.user in group.get_admin_and_staff %}
+						<a class="" href="{% url 'groups:group-ban-list' slug=group.slug %}" title="" data-ripple="">Ban list</a>
+						{% endif %}
+						{% if request.user.profile == group.admin_group %}
+						<a class="" href="{% url 'groups:group-update' slug=group.slug %}" title="" data-ripple="">Settings</a>
+						{% endif %}
+					</li>
+					{% endif %}
+				</ul>
 			</div>
 		</div>
 	</div>
@@ -43,8 +41,8 @@
 						<div class="col-lg-3">
 							<aside class="sidebar static">
 								{% if not request.user.is_anonymous %}
-									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-									{% endif %}
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+								{% endif %}
 							</aside>
 						</div><!-- sidebar -->
 						{% if request.user.profile not in group.get_followers_ban %}
@@ -91,14 +89,14 @@
 									<div class="user-post">
 										<div class="friend-info">
 											<figure>
-												<img src="{{ group.avatar.url }}" alt="">
+												<img src="{{ post.group.avatar.url }}" alt="">
 											</figure>
 											<div class="friend-name ">
 												<ins>
-													<a href="time-line.html" title="">{{ group.name }}</a>
+													<a href="time-line.html" title="">{{ post.group.name }}</a>
 												</ins>
 												<span>{{ post.created_date }}</span>
-												{% if request.user in group.get_admin_and_staff %}
+												{% if request.user.profile == group.admin_group or request.user.profile in group.staff.all %}
 												<form action="{% url 'posts:post-delete' pk=post.pk %}" method="post" class="delete-btn">
 													{% csrf_token %}
 													<button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
@@ -135,15 +133,14 @@
 															</form>
 														</li>
 														<li>
-																<span class="comment" data-toggle="tooltip" title="Comments">
-																	<i class="fa fa-comments-o"></i>
-																	<ins>{{ post.comments.count }}</ins>
-																</span>
+															<span class="comment" data-toggle="tooltip" title="Comments">
+																<i class="fa fa-comments-o"></i>
+																<ins>{{ post.comments.count }}</ins>
+															</span>
 														</li>
 													</ul>
 												</div>
 												<div class="description">
-
 													<p>
 														{{ post.text }}
 													</p>
@@ -152,7 +149,7 @@
 										</div>
 										<div class="coment-area">
 											<ul class="we-comet">
-												{% for comment in post.get_comments_post %}
+												{% for comment in post.comments.all %}
 												<li>
 													<div class="comet-avatar">
 														<img src="{{ comment.author.avatar.url }}" alt="">
@@ -176,9 +173,6 @@
 													</div>
 												</li>
 												{% endfor %}
-												<li>
-													<a href="#" title="" class="showmore underline">more comments</a>
-												</li>
 												{% if request.user.is_authenticated %}
 												<li class="post-comment">
 													<div class="comet-avatar">
@@ -214,7 +208,7 @@
 						</div>
 						{% endif %}
 						{% if request.user.profile not in group.get_followers_ban %}
-							{% include 'group/group_sidebar.html' %}
+						{% include 'group/group_sidebar.html' %}
 						{% endif %}
 					</div>
 				</div>
@@ -224,6 +218,6 @@
 </section>
 
 {% if request.user.profile == group.admin_group %}
-	{% include 'group/group_modal.html' %}
+{% include 'group/group_modal.html' %}
 {% endif %}
 {% endblock content %}

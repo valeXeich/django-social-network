@@ -50,7 +50,9 @@ class Group(models.Model):
 
     def get_posts(self):
         """"Get group posts"""
-        group_posts = self.group_post.select_related('author', 'group').prefetch_related('liked', 'disliked', 'comments').all()
+        group_posts = self.group_post.select_related('author', 'group').\
+            prefetch_related('liked', 'disliked', 'comments__author').\
+            order_by('-created_date')
         return group_posts
 
     def save(self, *args, **kwargs):

@@ -22,12 +22,9 @@ class Post(models.Model):
         validators=[FileExtensionValidator(['mp4'])],
         blank=True
     )
+    vimeo_url = models.CharField(max_length=100, blank=True, null=True)
     updated_date = models.DateTimeField(auto_now=True)
     created_date = models.DateTimeField(auto_now_add=True)
-
-    def get_comments_post(self):
-        """"Getting comments on a post"""
-        return self.comments.all()
 
     def __str__(self):
         return f'Post author: {self.author}'

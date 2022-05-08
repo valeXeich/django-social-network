@@ -1,4 +1,6 @@
-{% extends '../../base.html' %}
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock title %}
 
 {% load i18n %}
 
@@ -14,14 +16,14 @@
 						<p>
 							Winku is free to use for as long as you want with two active projects.
 						</p>
-					</div>	
+					</div>
 				</div>
 			</div>
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12">
 				<div class="login-reg-bg">
 					<div class="log-reg-area sign">
 						<h2 class="log-title">Login</h2>
-						<form method="post" action="{% url 'login' %}">
+						<form method="post" action="{% url 'account_login' %}">
 							{% csrf_token %}
 							<div class="form-group">	
 							  {{ form.login }}
@@ -37,7 +39,7 @@
 							<a href="{% url 'account_reset_password' %}" class="forgot-pwd">Forgot Password?</a>
 							<div class="submit-btns">
 								<button class="mtr-btn" type="submit"><span>Login</span></button>
-								<a href="{% url 'signup' %}"><button class="mtr-btn" type="button"><span>Register</span></button></a>
+								<a href="{{ signup_url }}"><button class="mtr-btn" type="button"><span>Registration</span></button></a>
 							</div>
 							{% if form.errors %}
 								{% for field in form %}

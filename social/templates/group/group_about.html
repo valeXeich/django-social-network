@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Profile{% endblock title %}
+{% block title %}Group About{% endblock title %}
 
 {% block content %}
 <section>
@@ -30,8 +30,6 @@
 			</div>
 		</div>
 	</div>
-	</div>
-	</div>
 </section><!-- top area -->
 
 <section>
@@ -43,8 +41,8 @@
 						<div class="col-lg-3">
 							<aside class="sidebar static">
 								{% if not request.user.is_anonymous %}
-									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-									{% endif %}
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+								{% endif %}
 							</aside>
 						</div><!-- sidebar -->
 						{% if request.user.profile not in group.get_followers_ban %}

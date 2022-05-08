@@ -1,107 +1,105 @@
 {% extends 'base.html' %}
 
-{% block title %}Friends{% endblock title %}
+{% block title %}Groups{% endblock title %}
 
 {% block content %}
 <section>
-		<div class="feature-photo">
-					{% include 'profile/profile_button_background.html' %}
-					<div class="col-lg-10 col-sm-9">
-						<div class="timeline-info">
-							<ul>
-								<li class="admin-name">
-								  <h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
-								  <span>@{{ profile.slug }}</span>
-								</li>
-								<li>
-									<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
-									<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
-									<a class="active" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
-									{% if request.user == profile.user %}
-									<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
-									{% endif %}
-								</li>
-							</ul>
-						</div>
-					</div>
-				</div>
+	<div class="feature-photo">
+		{% include 'profile/profile_button_background.html' %}
+		<div class="col-lg-10 col-sm-9">
+			<div class="timeline-info">
+				<ul>
+					<li class="admin-name">
+						<h5>{{ profile.first_name }} {{ profile.last_name }}</h5>
+						<span>@{{ profile.slug }}</span>
+					</li>
+					<li>
+						<a class="" href="{{ profile.get_absolute_url }}" title="" data-ripple="">Wall</a>
+						<a class="" href="{% url 'profiles:profile-friends' slug=profile.slug %}" title="" data-ripple="">Friends</a>
+						<a class="active" href="{% url 'profiles:profile-groups' slug=profile.slug %}" title="" data-ripple="">Groups</a>
+						{% if request.user == profile.user %}
+						<a class="" href="{% url 'profiles:update-info' slug=profile.slug %}" title="" data-ripple="">Edit profile</a>
+						{% endif %}
+					</li>
+				</ul>
 			</div>
 		</div>
-	</section><!-- top area -->
+	</div>
+</section><!-- top area -->
 
-	<section>
-		<div class="gap gray-bg">
-			<div class="container-fluid">
-				<div class="row">
-					<div class="col-lg-12">
-						<div class="row" id="page-contents">
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/information.html' %}
-									{% if not request.user.is_anonymous %}
-									{% include 'shortcuts.html' %} <!-- Shortcuts -->
-									{% endif %}
-								</aside>
-							</div><!-- sidebar -->
+<section>
+	<div class="gap gray-bg">
+		<div class="container-fluid">
+			<div class="row">
+				<div class="col-lg-12">
+					<div class="row" id="page-contents">
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/information.html' %}
+								{% if not request.user.is_anonymous %}
+								{% include 'shortcuts.html' %} <!-- Shortcuts -->
+								{% endif %}
+							</aside>
+						</div><!-- sidebar -->
 
-                            <div class="col-lg-6">
-								<div class="central-meta">
-									<div class="groups">
-										<span><i class="fa fa-users"></i> Groups</span>
-									</div>
-									<div class="right-button">
-										<a href="{% url 'groups:create-group' %}"><button class="btn btn-primary btn-sm">Create Group</button></a>
-									</div>
-									<ul class="nearby-contct">
-										<form action="{% url 'groups:search-group' %}" method="get" class="d-flex search-group">
-											<input class="form-control mr-2" type="search" placeholder="Search group" aria-label="Search" name="search_group">
-											<button class="btn btn-outline-primary" type="submit">Search</button>
-										</form>
-										{% for group in profile.get_follow_groups %}
-										<li>
-											<div class="nearly-pepls">
-												<figure>
-													<a href="{{ group.get_absolute_url }}" title=""><img src="{{ group.avatar.url }}" alt=""></a>
-												</figure>
-												<div class="pepl-info">
-													<h4><a href="{{ group.get_absolute_url }}" title="">{{ group.name }} </a></h4>
-													<em>{{ group.followers.count }} Members</em>
-													{% if request.user.profile in group.followers.all %}
-													<form action="{% url 'groups:group-follow' %}" method="post">
-														{% csrf_token %}
-														<button type="submit" class="add-butn">Unfollow</button>
-														<input type="hidden" name="group_id" value="{{ group.id }}">
-														<input type="hidden" name="unfollow" value="unfollow">
-														<input type="hidden" name="from_profile" value="{{ profile.slug }}">
-													</form>
-													{% else %}
-													<form action="{% url 'groups:group-follow' %}" method="post">
-														{% csrf_token %}
-														<button type="submit" class="add-butn">Follow</button>
-														<input type="hidden" name="group_id" value="{{ group.id }}">
-														<input type="hidden" name="follow" value="follow">
-														<input type="hidden" name="from_profile" value="{{ profile.slug }}">
-													</form>
-													{% endif %}
-												</div>
+						<div class="col-lg-6">
+							<div class="central-meta">
+								<div class="groups">
+									<span><i class="fa fa-users"></i> Groups</span>
+								</div>
+								<div class="right-button">
+									<a href="{% url 'groups:create-group' %}"><button class="btn btn-primary btn-sm">Create Group</button></a>
+								</div>
+								<ul class="nearby-contct">
+									<form action="{% url 'groups:search-group' %}" method="get" class="d-flex search-group">
+										<input class="form-control mr-2" type="search" placeholder="Search group" aria-label="Search" name="search_group">
+										<button class="btn btn-outline-primary" type="submit">Search</button>
+									</form>
+									{% for group in profile.get_follow_groups %}
+									<li>
+										<div class="nearly-pepls">
+											<figure>
+												<a href="{{ group.get_absolute_url }}" title=""><img src="{{ group.avatar.url }}" alt=""></a>
+											</figure>
+											<div class="pepl-info">
+												<h4><a href="{{ group.get_absolute_url }}" title="">{{ group.name }} </a></h4>
+												<em>{{ group.followers.count }} Members</em>
+												{% if request.user.profile in group.followers.all %}
+												<form action="{% url 'groups:group-follow' %}" method="post">
+													{% csrf_token %}
+													<button type="submit" class="add-butn">Unfollow</button>
+													<input type="hidden" name="group_id" value="{{ group.id }}">
+													<input type="hidden" name="unfollow" value="unfollow">
+													<input type="hidden" name="from_profile" value="{{ profile.slug }}">
+												</form>
+												{% else %}
+												<form action="{% url 'groups:group-follow' %}" method="post">
+													{% csrf_token %}
+													<button type="submit" class="add-butn">Follow</button>
+													<input type="hidden" name="group_id" value="{{ group.id }}">
+													<input type="hidden" name="follow" value="follow">
+													<input type="hidden" name="from_profile" value="{{ profile.slug }}">
+												</form>
+												{% endif %}
 											</div>
-										</li>
-										{% endfor %}
-									</ul>
-								</div><!-- photos -->
-							</div><!-- centerl meta -->
+										</div>
+									</li>
+									{% endfor %}
+								</ul>
+							</div><!-- photos -->
+						</div><!-- centerl meta -->
 
-							<div class="col-lg-3">
-								<aside class="sidebar static">
-									{% include 'profile/friends_sidebar.html' %}
-								</aside>
-							</div><!-- sidebar -->
-						</div>
+						<div class="col-lg-3">
+							<aside class="sidebar static">
+								{% include 'profile/friends_sidebar.html' %}
+							</aside>
+						</div><!-- sidebar -->
 					</div>
 				</div>
 			</div>
 		</div>
-	</section>
+	</div>
+</section>
 
 {% if request.user == profile.user %}
 <!--modal change background-->
@@ -112,16 +110,16 @@
 				<h4 class="modal-title">Upload background</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
-			<div class="modal-body">
+				<div class="modal-body">
 					{% csrf_token %}
 					{{ form_ab.background }}
-				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-			</div>
-			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button class="btn btn-danger" data-dismiss="modal">Close</button>
-			</div>
-				</form>
+					<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>
@@ -134,16 +132,16 @@
 				<h4 class="modal-title">Upload avatar</h4>
 			</div>
 			<form action="{% url 'profiles:update-avatar' slug=profile.slug %}" method="post" enctype="multipart/form-data">
-			<div class="modal-body">
+				<div class="modal-body">
 					{% csrf_token %}
 					{{ form_ab.avatar }}
-				<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
-			</div>
-			<div class="modal-footer">
-				<button type="submit" class="btn btn-primary">Save</button>
-				<button class="btn btn-danger" data-dismiss="modal">Close</button>
-			</div>
-				</form>
+					<input type="hidden" name="profile_slug" value="{{ profile.slug }}">
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-primary">Save</button>
+					<button class="btn btn-danger" data-dismiss="modal">Close</button>
+				</div>
+			</form>
 		</div>
 	</div>
 </div>

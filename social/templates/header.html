@@ -1,21 +1,27 @@
 <div class="topbar stick">
-		<div class="logo">
-			<a title="" href="newsfeed.html"><img src="images/logo.png" alt=""></a>
-		</div>
-		{% if request.user.is_authenticated %}
-		<div class="top-area">
-			<ul>
-				<li>
-					<form action="{% url 'search' %}" method="get" class="d-flex">
-						<input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search" name="q">
-						<button class="btn btn-outline-success" type="submit"><i class="ti-search"></i></button>
-					</form>
-				</li>
-			</ul>
+	<div class="logo">
+		<a title="" href="#"><img src="/media/logo.png" alt=""></a>
+	</div>
+	{% if request.user.is_authenticated %}
+	<div class="top-area">
+		<ul>
+			<li>
+				<form action="{% url 'search' %}" method="get" class="d-flex">
+					<input class="form-control mr-2" type="search" placeholder="Search" aria-label="Search" name="q">
+					<button class="btn btn-outline-success" type="submit"><i class="ti-search"></i></button>
+				</form>
+			</li>
+		</ul>
 
-			<div class="user-img">
-				<img src="{{ profile.avatar.url }}" height="60" width="60" alt="">
-			</div>
+		<div class="user-img">
+			<img onclick="redirect()" src="{{ request.user.profile.avatar.url }}" height="60" width="60" alt="">
 		</div>
+	</div>
 	{% endif %}
-	</div><!-- topbar -->
+</div><!-- topbar -->
+
+<script>
+	function redirect() {
+		window.location = "{{ request.user.profile.get_absolute_url }}";
+	}
+</script>

@@ -9,12 +9,18 @@ class Dialog(models.Model):
     owner = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name='dialogues')
     companion = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
-    def get_messages_sender_list(self):
+    def get_messages_sender(self):
         """"Receiving dialog messages"""
-        messages_list = [message_owner for message_owner in self.owner.messages.filter(dialog=self)]
-        for message_companion in self.companion.messages.all():
+        messages_list = []
+        for message_owner in self.owner.messages.filter(dialog=self).values():
+            profile = Profile.objects.get(id=message_owner['sender_id'])
+            message_owner['avatar_url'] = profile.avatar.url
+            messages_list.append(message_owner)
+        for message_companion in self.companion.messages.all().values():
+            profile = Profile.objects.get(id=message_companion['sender_id'])
+            message_companion['avatar_url'] = profile.avatar.url
             messages_list.append(message_companion)
-        return sorted(messages_list, key=lambda message: message.created_date, reverse=False)
+        return sorted(messages_list, key=lambda message: message['created_date'], reverse=False)
 
     def get_absolute_url(self):
         return reverse('profiles:profile-dialog-detail', kwargs={'pk': self.pk})
