@@ -18,7 +18,7 @@ class Profile(models.Model):
     about = models.TextField(max_length=500, blank=True)
     email = models.EmailField(max_length=200, blank=True)
     country = CountryField(blank=True)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=False, default=None)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, blank=True, null=True)
     date_birth = models.DateField(blank=True, null=True)
     avatar = models.ImageField(default='avatars/avatar.png', upload_to='avatars/')
     background = models.ImageField(default='background/background.png', upload_to='background/')
@@ -35,7 +35,7 @@ class Profile(models.Model):
 
     def get_friends_list(self):
         """"Friend list"""
-        friend_list = self.user.friends.select_related('user').all()
+        friend_list = self.friends.select_related('profile').all()
         return friend_list
 
     def get_friends_request(self):

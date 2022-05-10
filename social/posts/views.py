@@ -223,3 +223,9 @@ class NewsView(LoginRequiredMixin, ListView):
         context['posts'] = posts
         context['online_users'] = get_online_users()
         return context
+
+
+class RedirectView(LoginRequiredMixin, View):
+    """"View to redirect from '/' to 'post/feed'"""
+    def get(self, request, *args, **kwargs):
+        return redirect('posts:news')

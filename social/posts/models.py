@@ -9,8 +9,8 @@ class Post(models.Model):
     """"Creating posts"""
     author = models.ForeignKey(Profile, verbose_name='Автор', on_delete=models.CASCADE, related_name='post')
     group = models.ForeignKey(Group, blank=True, null=True, on_delete=models.CASCADE, related_name='group_post')
-    liked = models.ManyToManyField(Profile, verbose_name='Лайки', default=None, related_name='likes')
-    disliked = models.ManyToManyField(Profile, verbose_name='Дизлайки', default=None, related_name='dislikes')
+    liked = models.ManyToManyField(Profile, verbose_name='Лайки', default=None, blank=True, related_name='likes')
+    disliked = models.ManyToManyField(Profile, verbose_name='Дизлайки', default=None, blank=True, related_name='dislikes')
     text = models.TextField()
     image = models.ImageField(
         upload_to='post_image',

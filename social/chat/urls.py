@@ -7,5 +7,5 @@ app_name = 'chat'
 urlpatterns = [
     path('create/message/', CreateMessageView.as_view(), name='create-message'),
     path('dialog/message', CreateOrGetDialog.as_view(), name='create-dialog'),
-    path('message/<int:pk>', MessageJson.as_view())
+    path('message/<int:pk>', MessageJson.as_view(), name='json_messages')
 ]

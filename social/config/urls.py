@@ -4,9 +4,11 @@ from django.contrib import admin
 from django.urls import path, include
 from django.contrib.auth.views import LogoutView
 
+from posts.views import RedirectView
 from profiles.views import SearchProfileView
 
 urlpatterns = [
+    path('', RedirectView.as_view()),
     path('admin/', admin.site.urls),
     path('profile/', include('profiles.urls')),
     path('post/', include('posts.urls')),

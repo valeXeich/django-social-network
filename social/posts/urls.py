@@ -1,7 +1,15 @@
 from django.urls import path
 from django.views.decorators.http import require_POST
 
-from .views import PostFormView, LikeUpdate, DislikeUpdate, CommentView, DeletePostView, DeleteCommentView, NewsView
+from .views import (
+    PostFormView,
+    LikeUpdate,
+    DislikeUpdate,
+    CommentView,
+    DeletePostView,
+    DeleteCommentView,
+    NewsView,
+    )
 
 app_name = 'posts'
 
