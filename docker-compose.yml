@@ -1,0 +1,41 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: admin
+  web:
+    build: .
+    command: >
+      bash -c "python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./social:/user/app
+    ports:
+      - 8000:8000
+    environment:
+      - CELERY_BROKER=redis://redis:6379/0
+      - CELERY_BACKEND=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+  celery:
+    build: .
+    command: celery -A config worker -l info -P eventlet
+    volumes:
+      - ./social:/user/app
+    depends_on:
+      - web
+      - redis
+  redis:
+    image: redis
+
+volumes:
+  postgres_data:
+
