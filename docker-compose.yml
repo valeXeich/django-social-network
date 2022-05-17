@@ -27,7 +27,7 @@ services:
       - redis
   celery:
     build: .
-    command: celery -A config worker -l info -P eventlet
+    command: celery -A config worker -l info
     volumes:
       - ./social:/user/app
     depends_on:
