@@ -1,4 +1,4 @@
-# django-social-network
+# Simple Django Social Network
 Stack
 1. Django
 2. Postgresql
